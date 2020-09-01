@@ -1,0 +1,3 @@
+import MessengerLayoutContentComponent from "./MessengerLayoutContentComponent";
+
+export default MessengerLayoutContentComponent
