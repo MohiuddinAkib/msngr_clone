@@ -4,21 +4,44 @@ import Slide from "@material-ui/core/Slide";
 import GifIcon from "@material-ui/icons/Gif";
 import Dialog from "@material-ui/core/Dialog";
 import NoteIcon from "@material-ui/icons/Note";
+import Button from "@material-ui/core/Button";
 import CameraIcon from "@material-ui/icons/Camera";
 import IconButton from "@material-ui/core/IconButton";
-import useTheme from "@material-ui/core/styles/useTheme";
-import useMediaQuery from "@material-ui/core/useMediaQuery";
 import InsertPhotoIcon from "@material-ui/icons/InsertPhoto";
 import KeyboardVoiceIcon from "@material-ui/icons/KeyboardVoice";
-import Button from "@material-ui/core/Button";
+import {createStyles, makeStyles} from "@material-ui/core/styles";
+import {TransitionProps} from "@material-ui/core/transitions/transition";
 
 interface Props {
     buttonsPositionOnTop?: boolean
     showHiddenBtns?: boolean
-    dialog?: boolean
+    dialog?: boolean;
+    onClose?: () => void
 }
 
+const useStyles = makeStyles(theme => createStyles({
+    dialogScrollPaper: {
+        [theme.breakpoints.between("xs", "sm")]: {
+            alignItems: "flex-end",
+        }
+    },
+    dialogPaperFullScreen: {
+        [theme.breakpoints.between("xs", "sm")]: {
+            height: "50%"
+        }
+    }
+}))
+
+const Transition = React.forwardRef(function Transition(
+    props: TransitionProps & { children?: React.ReactElement },
+    ref: React.Ref<unknown>,
+) {
+    return <Slide direction="up" ref={ref} {...props}/>;
+});
+
 const MessageActionBtnsComponent: React.FC<Props> = (props) => {
+
+    const classes = useStyles()
 
     const cameraBtn = (
         <IconButton color={"primary"}>
@@ -43,16 +66,22 @@ const MessageActionBtnsComponent: React.FC<Props> = (props) => {
                 )
             }
             <Slide
+                exit
+                appear
+                unmountOnExit
                 direction="right"
                 in={!props.buttonsPositionOnTop && props.showHiddenBtns}
-                unmountOnExit>
+            >
                 {cameraBtn}
             </Slide>
 
             <Slide
+                exit
+                appear
+                unmountOnExit
                 direction="right"
                 in={!props.buttonsPositionOnTop && props.showHiddenBtns}
-                unmountOnExit>
+            >
                 {recordBtn}
             </Slide>
 
@@ -73,9 +102,16 @@ const MessageActionBtnsComponent: React.FC<Props> = (props) => {
     const buttonsWhenDialog = (
         <Dialog
             fullScreen
+            keepMounted
+            onClose={props.onClose}
+            TransitionComponent={Transition}
             open={props.dialog && props.showHiddenBtns}
+            classes={{
+                scrollPaper: classes.dialogScrollPaper,
+                paperFullScreen: classes.dialogPaperFullScreen
+            }}
         >
-            <Button>
+            <Button onClick={props.onClose}>
                 First button
             </Button>
         </Dialog>
@@ -95,7 +131,8 @@ MessageActionBtnsComponent.defaultProps = {
 MessageActionBtnsComponent.propTypes = {
     buttonsPositionOnTop: propTypes.bool,
     showHiddenBtns: propTypes.bool,
-    dialog: propTypes.bool
+    dialog: propTypes.bool,
+    onClose: propTypes.func
 }
 
 export default MessageActionBtnsComponent;

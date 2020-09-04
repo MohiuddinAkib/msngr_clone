@@ -32,7 +32,7 @@ const MessageActionContainerComponent: React.FC<Props> = (props) => {
         </Slide>)
 
     const msgActionBtnsWhenXsAndSm = (
-        <MessageActionBtnsComponent buttonsPositionOnTop dialog showHiddenBtns={open}/>
+        <MessageActionBtnsComponent buttonsPositionOnTop dialog showHiddenBtns={open} onClose={handleOpen}/>
     )
 
     return (
@@ -46,7 +46,8 @@ const MessageActionContainerComponent: React.FC<Props> = (props) => {
                             <AddCircleOulineIcon fontSize={"large"}/>
                         </IconButton>
 
-                        <Slide direction="right" mountOnEnter unmountOnExit in={width >= 600}>
+                        <Slide direction="right" mountOnEnter unmountOnExit
+                               in={width >= 600 && !xsAndSm}>
                             <span>
                                 <MessageActionBtnsComponent showHiddenBtns={open}/>
                             </span>
