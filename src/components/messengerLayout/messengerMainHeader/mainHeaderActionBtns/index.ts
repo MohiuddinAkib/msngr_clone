@@ -1,0 +1,4 @@
+import MainHeaderActionBtnsComponent
+    from "@components/messengerLayout/messengerMainHeader/mainHeaderActionBtns/MainHeaderActionBtnsComponent";
+
+export default MainHeaderActionBtnsComponent

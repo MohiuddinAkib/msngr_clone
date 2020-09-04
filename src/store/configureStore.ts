@@ -7,7 +7,7 @@ import {configureStore, ThunkAction, Action} from "@reduxjs/toolkit";
 
 import {MakeStore, createWrapper, Context, HYDRATE} from 'next-redux-wrapper';
 
-export const store = configureStore({
+const store = configureStore({
     reducer: rootReducer,
     middleware: getDefaultMiddleware => getDefaultMiddleware({
         thunk: {

@@ -1,0 +1,4 @@
+import MessageActionBtnsComponent
+    from "@components/messengerLayout/messengerLayoutContent/messageActionContainer/messageActionBtns/MessageActionBtnsComponent";
+
+export default MessageActionBtnsComponent

@@ -16,6 +16,13 @@ const Fullscreen = getFullscreen(styled)
 
 scheme.configureHeader(builder => {
     builder
+        .registerConfig("xs", {
+            initialHeight: 64,
+            position: "relative",
+            clipped: false
+        })
+
+    builder
         .registerConfig("md", {
             initialHeight: 64,
             position: "relative",
