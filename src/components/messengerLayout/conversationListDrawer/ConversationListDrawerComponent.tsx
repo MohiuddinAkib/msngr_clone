@@ -9,6 +9,10 @@ const DrawerSidebar = getDrawerSidebar(styled);
 const SidebarContent = getSidebarContent(styled)
 
 const useStyles = makeStyles(theme => createStyles({
+    drawerPaperRoot: {
+        minWidth: 300,
+        maxWidth: 420
+    },
     title: {
         fontWeight: "bold"
     },
@@ -19,10 +23,23 @@ const useStyles = makeStyles(theme => createStyles({
 
 const ConversationListDrawerComponent: React.FC = (props) => {
     const classes = useStyles()
+    const [trigger, setTrigger] = React.useState(undefined)
+
+    const handleDrawerScroll = (event: React.UIEvent<HTMLDivElement, UIEvent>) => {
+        const scrollTop = (event.target as HTMLDivElement).scrollTop
+
+        setTrigger(scrollTop > 1 ? true : false)
+    }
 
     return (
-        <DrawerSidebar sidebarId={"left_sidebar"}>
-            <ConversationListDrawerHeaderComponent/>
+        <DrawerSidebar
+            sidebarId={"left_sidebar"}
+            onScroll={handleDrawerScroll}
+            classes={{
+                paper: classes.drawerPaperRoot
+            }}
+        >
+            <ConversationListDrawerHeaderComponent trigger={trigger}/>
             <SidebarContent>
                 <ConversationListComponent/>
             </SidebarContent>

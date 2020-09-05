@@ -1,4 +1,5 @@
 import React from "react";
+import Head from "next/head"
 import styled from "styled-components";
 import CssBaseline from "@material-ui/core/CssBaseline";
 import Layout, {
@@ -18,14 +19,14 @@ scheme.configureHeader(builder => {
     builder
         .registerConfig("xs", {
             initialHeight: 64,
-            position: "relative",
+            position: "absolute",
             clipped: false
         })
 
     builder
         .registerConfig("md", {
             initialHeight: 64,
-            position: "relative",
+            position: "absolute",
         })
 })
 
@@ -34,14 +35,21 @@ scheme.configureEdgeSidebar(builder => {
         .create("right_sidebar", {anchor: "right"})
         .registerPersistentConfig("md", {
             width: 200,
-            collapsible: false,
+            collapsible: true,
+            autoExpanded: true,
+            headerMagnetEnabled: true,
+            persistentBehavior: "fit",
+        })
+        .registerPersistentConfig("md", {
+            width: 360,
+            collapsible: true,
             autoExpanded: true,
             headerMagnetEnabled: true,
             persistentBehavior: "fit",
         })
         .registerPersistentConfig("xl", {
             width: 420,
-            collapsible: false,
+            collapsible: true,
             autoExpanded: true,
             headerMagnetEnabled: true,
             persistentBehavior: "fit",
@@ -54,16 +62,23 @@ scheme.configureEdgeSidebar(builder => {
                 anchor: "left",
             })
         .registerPermanentConfig(
-            "xl",
+            "md",
             {
-                width: 420,
+                width: 300,
                 collapsible: false,
                 autoExpanded: true,
             })
         .registerPermanentConfig(
-            "md",
+            "lg",
             {
-                width: 300,
+                width: "25vw",
+                collapsible: false,
+                autoExpanded: true,
+            })
+        .registerPermanentConfig(
+            "xl",
+            {
+                width: 420,
                 collapsible: false,
                 autoExpanded: true,
             })
@@ -72,6 +87,10 @@ scheme.configureEdgeSidebar(builder => {
 const MessengerLayout: React.FC = (props) => {
     return (
         <Fullscreen>
+            <Head>
+                <title>Messenger</title>
+            </Head>
+
             <Root scheme={scheme}>
                 <CssBaseline/>
                 <MessengerMainHeaderComponent/>

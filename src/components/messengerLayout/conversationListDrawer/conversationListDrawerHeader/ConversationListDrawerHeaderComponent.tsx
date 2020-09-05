@@ -1,4 +1,5 @@
-import React from 'react';
+import React from "react";
+import propTypes from "prop-types"
 import Grid from "@material-ui/core/Grid";
 import Avatar from "@material-ui/core/Avatar";
 import AppBar from "@material-ui/core/AppBar";
@@ -7,9 +8,13 @@ import CreateIcon from "@material-ui/icons/Create";
 import Typography from "@material-ui/core/Typography";
 import IconButton from "@material-ui/core/IconButton";
 import SettingsIcon from "@material-ui/icons/Settings";
-import {createStyles, makeStyles} from "@material-ui/core/styles";
 import useTheme from "@material-ui/core/styles/useTheme";
 import useMediaQuery from "@material-ui/core/useMediaQuery";
+import {createStyles, makeStyles} from "@material-ui/core/styles";
+
+interface Props {
+    trigger: boolean
+}
 
 const useStyles = makeStyles(theme => createStyles({
     title: {
@@ -20,17 +25,17 @@ const useStyles = makeStyles(theme => createStyles({
     }
 }))
 
-const ConversationListDrawerHeaderComponent: React.FC = (props) => {
+const ConversationListDrawerHeaderComponent: React.FC<Props> = (props) => {
     const theme = useTheme()
     const classes = useStyles()
     const atMdAndLg = useMediaQuery(theme.breakpoints.between("md", "lg"))
 
     return (
         <>
-            <AppBar position={"absolute"} elevation={0} color={"inherit"}>
+            <AppBar position={"absolute"} elevation={props.trigger ? 1 : 0} color={"inherit"}>
                 <Toolbar>
                     <Grid container justify={"space-between"} alignItems={"center"}>
-                        <Grid item container md={6} spacing={2}>
+                        <Grid item container md={6} spacing={2} alignItems={"center"}>
                             <Grid item>
                                 <Avatar
                                     sizes={"large"}
@@ -58,5 +63,9 @@ const ConversationListDrawerHeaderComponent: React.FC = (props) => {
         </>
     );
 };
+
+ConversationListDrawerHeaderComponent.propTypes = {
+    trigger: propTypes.bool.isRequired
+}
 
 export default ConversationListDrawerHeaderComponent;

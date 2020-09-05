@@ -27,7 +27,8 @@ const useStyles = makeStyles(theme => createStyles({
     },
     dialogPaperFullScreen: {
         [theme.breakpoints.between("xs", "sm")]: {
-            height: "50%"
+            height: "auto",
+            minHeight: "50vh"
         }
     }
 }))

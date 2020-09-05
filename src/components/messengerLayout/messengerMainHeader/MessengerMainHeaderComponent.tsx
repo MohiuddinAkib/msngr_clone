@@ -12,11 +12,15 @@ const Header = getHeader(styled);
 const useStyles = makeStyles((theme) => createStyles({
     appBar: {
         marginRight: "0 !important",
+        backgroundColor: theme.palette.common.white,
         zIndex: theme.zIndex.drawer + 1,
         [theme.breakpoints.only("xl")]: {
             width: "calc(100% - 420px) !important",
         },
-        [theme.breakpoints.between("md", "lg")]: {
+        [theme.breakpoints.only("lg")]: {
+            width: "calc(100% - 25vw) !important",
+        },
+        [theme.breakpoints.only("md")]: {
             width: "calc(100% - 300px) !important",
         }
     },
