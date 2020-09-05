@@ -10,11 +10,20 @@ import MessageActionBtnsComponent
     from "@components/messengerLayout/messengerLayoutContent/messageActionContainer/messageActionBtns";
 import useTheme from "@material-ui/core/styles/useTheme";
 import useMediaQuery from "@material-ui/core/useMediaQuery";
+import {createStyles, makeStyles} from "@material-ui/core/styles";
 
 interface Props {
 }
 
+const useStyles = makeStyles(theme => createStyles({
+    msgActionBtnsPositionTopContainer: {
+        backgroundColor: "#fafafa"
+    }
+}))
+
 const MessageActionContainerComponent: React.FC<Props> = (props) => {
+    const classes = useStyles()
+
     const theme = useTheme()
     const xsAndSm = useMediaQuery(theme.breakpoints.between("xs", "sm"))
 
@@ -25,8 +34,8 @@ const MessageActionContainerComponent: React.FC<Props> = (props) => {
     };
 
     const msgActionBtnsWhenGraterThanSm = (width: number) => (
-        <Slide direction="up" unmountOnExit mountOnEnter in={open && (width < 600)}>
-            <Grid item component={Box} xs={12}>
+        <Slide direction="up" unmountOnExit  in={open && (width < 600)}>
+            <Grid item component={Box} xs={12} className={classes.msgActionBtnsPositionTopContainer}>
                 <MessageActionBtnsComponent buttonsPositionOnTop/>
             </Grid>
         </Slide>)
@@ -46,7 +55,7 @@ const MessageActionContainerComponent: React.FC<Props> = (props) => {
                             <AddCircleOulineIcon fontSize={"large"}/>
                         </IconButton>
 
-                        <Slide direction="right" mountOnEnter unmountOnExit
+                        <Slide direction="right"  unmountOnExit
                                in={width >= 600 && !xsAndSm}>
                             <span>
                                 <MessageActionBtnsComponent showHiddenBtns={open}/>

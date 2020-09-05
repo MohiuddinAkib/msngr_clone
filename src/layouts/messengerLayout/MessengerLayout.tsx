@@ -41,7 +41,7 @@ scheme.configureEdgeSidebar(builder => {
             persistentBehavior: "fit",
         })
         .registerPersistentConfig("md", {
-            width: 360,
+            width: "30vw",
             collapsible: true,
             autoExpanded: true,
             headerMagnetEnabled: true,

@@ -67,8 +67,6 @@ const MessageActionBtnsComponent: React.FC<Props> = (props) => {
                 )
             }
             <Slide
-                exit
-                appear
                 unmountOnExit
                 direction="right"
                 in={!props.buttonsPositionOnTop && props.showHiddenBtns}
@@ -77,8 +75,6 @@ const MessageActionBtnsComponent: React.FC<Props> = (props) => {
             </Slide>
 
             <Slide
-                exit
-                appear
                 unmountOnExit
                 direction="right"
                 in={!props.buttonsPositionOnTop && props.showHiddenBtns}
