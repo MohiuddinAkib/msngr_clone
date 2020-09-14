@@ -3,6 +3,7 @@ import Head from "next/head";
 import {AppProps} from "next/app"
 import PropTypes from "prop-types";
 import {Action, Store} from "redux";
+import "emoji-mart/css/emoji-mart.css"
 import firebase from "@config/firebase"
 import {ReactReduxContext} from "react-redux";
 import {StylesProvider} from "@material-ui/styles";

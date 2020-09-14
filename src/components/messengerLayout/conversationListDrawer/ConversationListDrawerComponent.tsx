@@ -1,13 +1,12 @@
 import React from "react";
 import styled from "styled-components";
 import {Scrollbars} from "react-custom-scrollbars";
+import {getDrawerSidebar} from "@mui-treasury/layout";
 import {createStyles, makeStyles} from "@material-ui/core/styles";
-import {getDrawerSidebar, getSidebarContent} from "@mui-treasury/layout";
 import ConversationListDrawerHeaderComponent from "./conversationListDrawerHeader";
 import ConversationListComponent from "@containers/messengerLayout/conversationList";
 
 const DrawerSidebar = getDrawerSidebar(styled);
-const SidebarContent = getSidebarContent(styled)
 
 const useStyles = makeStyles(theme => createStyles({
     drawerPaperRoot: {
@@ -49,7 +48,6 @@ const ConversationListDrawerComponent: React.FC = (props) => {
         >
             <ConversationListDrawerHeaderComponent trigger={trigger}/>
 
-            {/*<SidebarContent className={classes.sidebarContent}>*/}
             <Scrollbars
                 universal
                 style={{
@@ -58,7 +56,6 @@ const ConversationListDrawerComponent: React.FC = (props) => {
             >
                 <ConversationListComponent/>
             </Scrollbars>
-            {/*</SidebarContent>*/}
         </DrawerSidebar>
     );
 };

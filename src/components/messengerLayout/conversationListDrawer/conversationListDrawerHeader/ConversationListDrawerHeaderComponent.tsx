@@ -49,11 +49,11 @@ const ConversationListDrawerHeaderComponent: React.FC<Props> = (props) => {
                         </Grid>
                         <Grid item md={6} className={classes.actionsContainer}>
                             <IconButton>
-                                <SettingsIcon fontSize={!atMdAndLg ? "large" : "small"}/>
+                                <SettingsIcon/>
                             </IconButton>
 
                             <IconButton>
-                                <CreateIcon fontSize={!atMdAndLg ? "large" : "small"}/>
+                                <CreateIcon/>
                             </IconButton>
                         </Grid>
                     </Grid>

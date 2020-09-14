@@ -12,7 +12,7 @@
     "@material-ui/icons": "^4.9.1",
     "@mui-treasury/layout": "^4.5.0",
     "@reduxjs/toolkit": "^1.4.0",
-    "emoji-picker-react": "^3.2.3",
+    "emoji-mart": "^3.0.0",
     "firebase": "^7.19.1",
     "material-ui-popup-state": "^1.6.1",
     "next": "9.4.4",
@@ -29,6 +29,7 @@
     "styled-components": "^5.1.1"
   },
   "devDependencies": {
+    "@types/emoji-mart": "^3.0.2",
     "@types/node": "^14.0.23",
     "@types/react": "^16.9.43",
     "@types/react-redux": "^7.1.9",

@@ -1,8 +1,7 @@
 import React from "react";
-import dynamic from "next/dynamic"
 import Fade from "@material-ui/core/Fade"
 import Popper from "@material-ui/core/Popper";
-import {IEmojiData} from "emoji-picker-react";
+import {BaseEmoji, Picker} from "emoji-mart"
 import TextField from "@material-ui/core/TextField";
 import IconButton from "@material-ui/core/IconButton";
 import InputAdornment from "@material-ui/core/InputAdornment";
@@ -10,9 +9,6 @@ import {createStyles, makeStyles} from "@material-ui/core/styles";
 import ClickAwayListener from "@material-ui/core/ClickAwayListener";
 import SentimentSatisfiedAltIcon from "@material-ui/icons/SentimentSatisfied";
 import {usePopupState, bindTrigger, bindPopper} from "material-ui-popup-state/hooks"
-
-
-const Picker = dynamic(() => import("emoji-picker-react"), {ssr: false})
 
 const useStyles = makeStyles(theme => createStyles({
     emojiPickerContainer: {
@@ -39,12 +35,22 @@ const MessageTextFieldComponent: React.FC = (props) => {
         setText(event.target.value)
     }
 
+    const handleOnKeyPress = (event: React.KeyboardEvent) => {
+        if (event.key === "Enter") {
+            event.preventDefault()
+        }
+
+        if (event.shiftKey && event.key === "Enter") {
+            setText(prevText => prevText.concat("\n"))
+        }
+    }
+
     const handleClickAway = () => {
         popupState.close()
     }
 
-    const handleEmojiClick = (event: MouseEvent, emojiObject: IEmojiData) => {
-        setText(prevText => prevText.concat(emojiObject.emoji))
+    const handleEmojiClick = (emoji: BaseEmoji) => {
+        setText(prevText => prevText.concat(emoji.native))
     }
 
     return (
@@ -70,9 +76,11 @@ const MessageTextFieldComponent: React.FC = (props) => {
                         </InputAdornment>
                     )
                 }}
-                rows={1}
+                rowsMax={5}
                 variant={"outlined"}
                 onChange={handleOnChange}
+                onKeyPress={handleOnKeyPress}
+                placeholder={"Type a message..."}
             />
 
             <Popper
@@ -82,14 +90,17 @@ const MessageTextFieldComponent: React.FC = (props) => {
             >
                 {({TransitionProps}) => (
                     <Fade {...TransitionProps} timeout={350}>
-                        <ClickAwayListener onClickAway={handleClickAway}>
-                            <span className={classes.emojiPickerContainer}>
+                        <span className={classes.emojiPickerContainer}>
+                            <ClickAwayListener onClickAway={handleClickAway}>
                                 <Picker
-                                    disableSearchBar
-                                    onEmojiClick={handleEmojiClick}
+                                    title={""}
+                                    set={"facebook"}
+                                    showPreview={false}
+                                    emojiTooltip={false}
+                                    onSelect={handleEmojiClick}
                                 />
-                            </span>
-                        </ClickAwayListener>
+                            </ClickAwayListener>
+                        </span>
                     </Fade>
                 )}
 

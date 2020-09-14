@@ -41,7 +41,7 @@ const ConversationListComponent: React.FC = () => {
                         ),
 
                     }}
-
+                    placeholder={"Search in Messenger"}
                 />
             </ListSubheader>
         }>
