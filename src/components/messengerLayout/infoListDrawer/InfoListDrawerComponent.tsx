@@ -28,6 +28,7 @@ const DrawerSidebar = getDrawerSidebar(styled);
 const SidebarContent = getSidebarContent(styled)
 
 const useStyles = makeStyles(theme => createStyles({
+    infoDrawerPaper: {},
     profileAvatar: {
         margin: "auto",
         height: 100,
@@ -39,7 +40,7 @@ const useStyles = makeStyles(theme => createStyles({
     },
     activeStatusRoot: {
         textAlign: "center"
-    }
+    },
 }))
 
 const InfoListDrawerComponent: React.FC = (props) => {
@@ -56,7 +57,7 @@ const InfoListDrawerComponent: React.FC = (props) => {
     }
 
     return (
-        <DrawerSidebar sidebarId={"right_sidebar"}>
+        <DrawerSidebar sidebarId={"right_sidebar"} classes={{paper: classes.infoDrawerPaper}}>
             <Toolbar/>
             <SidebarContent>
                 <CardContent>
@@ -79,8 +80,8 @@ const InfoListDrawerComponent: React.FC = (props) => {
                         subheader={"Active 15min ago"}
                     />
                 </CardContent>
-                <Divider/>
                 <List>
+                    <Divider component={"li"}/>
                     <ListItem button onClick={handleMoreActionsCollapse}>
                         <ListItemText
                             primary="MORE ACTIONS"
@@ -135,7 +136,7 @@ const InfoListDrawerComponent: React.FC = (props) => {
                         </List>
                     </Collapse>
 
-                    <Divider/>
+                    <Divider component={"li"}/>
 
                     <ListItem button onClick={handleShowPrivacyAndPolicy}>
                         <ListItemText

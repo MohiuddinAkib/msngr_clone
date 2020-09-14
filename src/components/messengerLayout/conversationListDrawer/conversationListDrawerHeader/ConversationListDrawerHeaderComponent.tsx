@@ -64,6 +64,7 @@ const ConversationListDrawerHeaderComponent: React.FC<Props> = (props) => {
     );
 };
 
+
 ConversationListDrawerHeaderComponent.propTypes = {
     trigger: propTypes.bool.isRequired
 }

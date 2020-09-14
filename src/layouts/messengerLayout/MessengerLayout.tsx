@@ -2,10 +2,7 @@ import React from "react";
 import Head from "next/head"
 import styled from "styled-components";
 import CssBaseline from "@material-ui/core/CssBaseline";
-import Layout, {
-    Root,
-    getFullscreen,
-} from "@mui-treasury/layout";
+import Layout, {Root, getFullscreen} from "@mui-treasury/layout";
 import MessageListComponent from "@containers/messengerLayout/messageList";
 import InfoListDrawerComponent from "@components/messengerLayout/infoListDrawer";
 import MessengerMainHeaderComponent from "@components/messengerLayout/messengerMainHeader";
@@ -34,14 +31,14 @@ scheme.configureEdgeSidebar(builder => {
     builder
         .create("right_sidebar", {anchor: "right"})
         .registerPersistentConfig("md", {
-            width: 200,
+            width: 300,
             collapsible: true,
             autoExpanded: true,
             headerMagnetEnabled: true,
             persistentBehavior: "fit",
         })
-        .registerPersistentConfig("md", {
-            width: "30vw",
+        .registerPersistentConfig("lg", {
+            width: 360,
             collapsible: true,
             autoExpanded: true,
             headerMagnetEnabled: true,

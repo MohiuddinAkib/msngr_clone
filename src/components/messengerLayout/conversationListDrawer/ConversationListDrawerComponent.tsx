@@ -1,5 +1,6 @@
 import React from "react";
 import styled from "styled-components";
+import {Scrollbars} from "react-custom-scrollbars";
 import {createStyles, makeStyles} from "@material-ui/core/styles";
 import {getDrawerSidebar, getSidebarContent} from "@mui-treasury/layout";
 import ConversationListDrawerHeaderComponent from "./conversationListDrawerHeader";
@@ -18,12 +19,19 @@ const useStyles = makeStyles(theme => createStyles({
     },
     actionsContainer: {
         textAlign: "right"
+    },
+    sidebarContent: {
+        scrollbarWidth: "none",
+        msOverflowStyle: "none",
+        "&::-webkit-scrollbar": {
+            display: "none"
+        }
     }
 }))
 
 const ConversationListDrawerComponent: React.FC = (props) => {
     const classes = useStyles()
-    const [trigger, setTrigger] = React.useState(undefined)
+    const [trigger, setTrigger] = React.useState(false)
 
     const handleDrawerScroll = (event: React.UIEvent<HTMLDivElement, UIEvent>) => {
         const scrollTop = (event.target as HTMLDivElement).scrollTop
@@ -40,9 +48,17 @@ const ConversationListDrawerComponent: React.FC = (props) => {
             }}
         >
             <ConversationListDrawerHeaderComponent trigger={trigger}/>
-            <SidebarContent>
+
+            {/*<SidebarContent className={classes.sidebarContent}>*/}
+            <Scrollbars
+                universal
+                style={{
+                    height: "100vh",
+                }}
+            >
                 <ConversationListComponent/>
-            </SidebarContent>
+            </Scrollbars>
+            {/*</SidebarContent>*/}
         </DrawerSidebar>
     );
 };

@@ -1,6 +1,7 @@
 import React from "react";
 import dynamic from "next/dynamic"
-import Popper from '@material-ui/core/Popper';
+import Fade from "@material-ui/core/Fade"
+import Popper from "@material-ui/core/Popper";
 import {IEmojiData} from "emoji-picker-react";
 import TextField from "@material-ui/core/TextField";
 import IconButton from "@material-ui/core/IconButton";
@@ -8,6 +9,8 @@ import InputAdornment from "@material-ui/core/InputAdornment";
 import {createStyles, makeStyles} from "@material-ui/core/styles";
 import ClickAwayListener from "@material-ui/core/ClickAwayListener";
 import SentimentSatisfiedAltIcon from "@material-ui/icons/SentimentSatisfied";
+import {usePopupState, bindTrigger, bindPopper} from "material-ui-popup-state/hooks"
+
 
 const Picker = dynamic(() => import("emoji-picker-react"), {ssr: false})
 
@@ -25,27 +28,24 @@ const useStyles = makeStyles(theme => createStyles({
 const MessageTextFieldComponent: React.FC = (props) => {
     const classes = useStyles()
 
+    const popupState = usePopupState({
+        variant: "popper",
+        popupId: "emoji-popper",
+    })
+
     const [text, setText] = React.useState("")
-    const [anchorEl, setAnchorEl] = React.useState<HTMLElement | null>(null);
 
     const handleOnChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         setText(event.target.value)
     }
 
     const handleClickAway = () => {
-        setAnchorEl(null)
-    }
-
-    const handlePopoverToggle = (event: React.MouseEvent<HTMLElement, MouseEvent>) => {
-        setAnchorEl(anchorEl ? null : event.currentTarget);
+        popupState.close()
     }
 
     const handleEmojiClick = (event: MouseEvent, emojiObject: IEmojiData) => {
         setText(prevText => prevText.concat(emojiObject.emoji))
     }
-
-    const open = Boolean(anchorEl);
-    const id = open ? 'emoji-popper' : undefined;
 
     return (
         <>
@@ -62,33 +62,37 @@ const MessageTextFieldComponent: React.FC = (props) => {
                     endAdornment: (
                         <InputAdornment position={"end"}>
                             <IconButton
-                                aria-describedby={id}
                                 color={"primary"}
-                                onClick={handlePopoverToggle}>
+                                {...bindTrigger(popupState)}
+                            >
                                 <SentimentSatisfiedAltIcon fontSize={"large"}/>
                             </IconButton>
                         </InputAdornment>
                     )
                 }}
+                rows={1}
                 variant={"outlined"}
                 onChange={handleOnChange}
             />
 
             <Popper
-                id={id}
-                open={open}
-                disablePortal
+                transition
                 placement={"top-end"}
-                anchorEl={anchorEl}
+                {...bindPopper(popupState)}
             >
-                <ClickAwayListener onClickAway={handleClickAway}>
-                    <span className={classes.emojiPickerContainer}>
-                        <Picker
-                            disableSearchBar
-                            onEmojiClick={handleEmojiClick}
-                        />
-                    </span>
-                </ClickAwayListener>
+                {({TransitionProps}) => (
+                    <Fade {...TransitionProps} timeout={350}>
+                        <ClickAwayListener onClickAway={handleClickAway}>
+                            <span className={classes.emojiPickerContainer}>
+                                <Picker
+                                    disableSearchBar
+                                    onEmojiClick={handleEmojiClick}
+                                />
+                            </span>
+                        </ClickAwayListener>
+                    </Fade>
+                )}
+
             </Popper>
         </>
     );
