@@ -15,6 +15,8 @@ import {createStyles, makeStyles, useTheme} from "@material-ui/core/styles";
 import BottomNavigationAction from "@material-ui/core/BottomNavigationAction";
 import SentimentSatisfiedAltIcon from "@material-ui/icons/SentimentSatisfied";
 import {usePopupState, bindTrigger, bindPopper} from "material-ui-popup-state/hooks"
+import IGif from "@giphy/js-types/dist/gif";
+import {SearchContextManager} from "@giphy/react-components";
 
 const useStyles = makeStyles(theme => createStyles({
     messageTextField: {
@@ -64,6 +66,10 @@ const MessageFieldComponent: React.FC = (props) => {
 
     const handleEmojiClick = (emoji: BaseEmoji) => {
         setText(prevText => prevText.concat(emoji.native))
+    }
+
+    const handleGifClick = (gif: IGif, e: React.SyntheticEvent<HTMLElement, Event>) => {
+        console.log(gif)
     }
 
     return (
@@ -147,13 +153,20 @@ const MessageFieldComponent: React.FC = (props) => {
                     in={bottomNavVal === "gif"}
                 >
                     <span>
+                         <SearchContextManager
+                             initialTerm={"vegeta"}
+                             apiKey={process.env.NEXT_PUBLIC_GIPHY_SDK_API_KEY}
+                             options={{
+                                 type: "stickers",
+
+                             }}
+                         >
                         <GifPickerComponent
                             width={window.innerWidth}
-                            // onSelected={(gif) => {
-                            //     console.log(gif)
-                            // }}
+                            onGifClick={handleGifClick}
                             // className={classes.giphyPicker}
                         />
+                         </SearchContextManager>
                     </span>
                 </Fade>
                 <BottomNavigation

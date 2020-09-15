@@ -1,42 +1,64 @@
 import React from "react";
-import {GiphyFetch} from "@giphy/js-fetch-api"
-import {Grid, SearchBar, SearchContext, SearchContextManager, SuggestionBar} from "@giphy/react-components"
+import IGif from "@giphy/js-types/dist/gif";
+import {Carousel, SearchContext, SuggestionBar} from "@giphy/react-components"
+import TextField from "@material-ui/core/TextField";
 
 interface Props {
     columns?: number;
     width?: number;
+    initialTerm?: string;
+    onGifClick: (gif: IGif, e: React.SyntheticEvent<HTMLElement, Event>) => void;
 }
 
-const gf = new GiphyFetch(process.env.NEXT_PUBLIC_GIPHY_SDK_API_KEY)
-// const fetchGifs = (offset: number) => gf.trending({offset, limit: 10})
-
 const GifPickerComponent: React.FC<Props> = (props) => {
-        const {fetchGifs, searchKey} = React.useContext(SearchContext)
+    const [searchTerm, setSearchTerm] = React.useState("")
+    const {fetchGifs, searchKey, setSearch} = React.useContext(SearchContext)
 
-        console.log(props.width)
+    React.useEffect(() => {
+        setSearchTerm(searchKey)
+    }, [searchKey])
 
-        return (
-            <>
-                {/*<SearchContextManager apiKey={process.env.NEXT_PUBLIC_GIPHY_SDK_API_KEY}>*/}
-                {/*    <SearchBar/>*/}
-                {/*    <SuggestionBar/>*/}
-                <Grid
-                    noLink
-                    width={props.width}
-                    onGifClick={() => {
-                    }}
-                    fetchGifs={fetchGifs}
-                    columns={props.columns}
-                />
-                {/*</SearchContextManager>*/}
-            </>
-        );
+    const handleSearchTerm = (e: React.ChangeEvent<HTMLInputElement>) => {
+        setSearchTerm(e.target.value)
     }
-;
+
+    const handleSearchTermEnterPress = (e: React.KeyboardEvent<HTMLInputElement>) => {
+        if (e.key === "Enter") {
+            e.preventDefault()
+            if (!!searchTerm) {
+                setSearch(searchTerm)
+            }
+        }
+    }
+
+    return (
+        <>
+            <TextField
+                fullWidth
+                value={searchTerm}
+                variant={"outlined"}
+                onChange={handleSearchTerm}
+                onKeyPress={handleSearchTermEnterPress}
+            />
+            <SuggestionBar/>
+            <Carousel
+                noLink
+                key={searchKey}
+                gifHeight={200}
+                // width={props.width}
+                fetchGifs={fetchGifs}
+                // columns={props.columns}
+                // className={classes.grid}
+                onGifClick={props.onGifClick}
+            />
+        </>
+    );
+};
 
 GifPickerComponent.defaultProps = {
     width: 800,
-    columns: 3
+    columns: 3,
+    initialTerm: "vegeta"
 }
 
 export default GifPickerComponent;
