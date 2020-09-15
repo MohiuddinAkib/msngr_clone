@@ -1,4 +1,0 @@
-import ConversationListItemComponent
-    from "@components/messengerLayout/conversationListDrawer/conversationListItem/ConversationListItemComponent";
-
-export default ConversationListItemComponent

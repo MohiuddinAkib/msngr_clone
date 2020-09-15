@@ -1,4 +1,0 @@
-import ConversationListDrawerHeaderComponent
-    from "@components/messengerLayout/conversationListDrawer/conversationListDrawerHeader/ConversationListDrawerHeaderComponent";
-
-export default ConversationListDrawerHeaderComponent

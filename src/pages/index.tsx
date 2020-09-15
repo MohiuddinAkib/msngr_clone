@@ -1,6 +1,6 @@
 import React from "react"
 import {NextPage} from "next";
-import MessengerLayout from "@src/layouts/messengerLayout";
+import MessengerLayout from "@src/layouts/MessengerLayout";
 
 const Home: NextPage = (props) => {
     React.useEffect(() => {

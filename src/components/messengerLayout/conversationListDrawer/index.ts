@@ -1,3 +1,0 @@
-import ConversationListDrawerComponent from "./ConversationListDrawerComponent";
-
-export default ConversationListDrawerComponent

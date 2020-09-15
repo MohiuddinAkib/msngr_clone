@@ -1,5 +1,5 @@
 import React from "react";
-import AuthLayout from "@layouts/authLayout";
+import AuthLayout from "@layouts/AuthLayout";
 
 const Login = () => {
     return (
