@@ -4,10 +4,10 @@ import styled from "styled-components";
 import CssBaseline from "@material-ui/core/CssBaseline";
 import Layout, {Root, getFullscreen} from "@mui-treasury/layout";
 import MessageListComponent from "@containers/messengerLayout/messageList";
-import InfoListDrawerComponent from "@components/messengerLayout/infoListDrawer";
+import InfoListDrawerComponent from "@components/messengerLayout/InfoListDrawer";
 import MessengerMainHeaderComponent from "@components/messengerLayout/messengerMainHeader";
 import ConversationListDrawerComponent from "@components/messengerLayout/conversationListDrawer";
-import MessengerLayoutContentComponent from "@components/messengerLayout/messengerLayoutContent";
+import LayoutContentComponent from "@components/messengerLayout/LayoutContent";
 
 const scheme = Layout();
 const Fullscreen = getFullscreen(styled)
@@ -92,9 +92,9 @@ const MessengerLayout: React.FC = (props) => {
                 <CssBaseline/>
                 <MessengerMainHeaderComponent/>
                 <ConversationListDrawerComponent/>
-                <MessengerLayoutContentComponent>
+                <LayoutContentComponent>
                     <MessageListComponent/>
-                </MessengerLayoutContentComponent>
+                </LayoutContentComponent>
                 <InfoListDrawerComponent/>
             </Root>
         </Fullscreen>

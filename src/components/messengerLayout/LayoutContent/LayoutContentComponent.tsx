@@ -6,11 +6,11 @@ import Card from "@material-ui/core/Card";
 import {getContent} from "@mui-treasury/layout";
 import CardContent from "@material-ui/core/CardContent";
 import CardActions from "@material-ui/core/CardActions";
-import MessageActionContainerComponent from "@components/messengerLayout/messengerLayoutContent/messageActionContainer";
+import MessageActionContainerComponent from "@components/messengerLayout/LayoutContent/ActionContainer";
 
 const Content = getContent(styled);
 
-const MessengerLayoutContentComponent: React.FC = (props) => {
+const LayoutContentComponent: React.FC = (props) => {
 
     return (
         <Content>
@@ -37,4 +37,4 @@ const MessengerLayoutContentComponent: React.FC = (props) => {
     );
 };
 
-export default MessengerLayoutContentComponent;
+export default LayoutContentComponent;

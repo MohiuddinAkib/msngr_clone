@@ -1,28 +1,36 @@
 import React from "react";
 import Fade from "@material-ui/core/Fade"
-import Popper from "@material-ui/core/Popper";
 import {BaseEmoji, Picker} from "emoji-mart"
+import GifIcon from "@material-ui/icons/Gif";
+import Drawer from "@material-ui/core/Drawer";
+import Popper from "@material-ui/core/Popper";
 import TextField from "@material-ui/core/TextField";
 import IconButton from "@material-ui/core/IconButton";
+import useMediaQuery from "@material-ui/core/useMediaQuery";
 import InputAdornment from "@material-ui/core/InputAdornment";
-import {createStyles, makeStyles} from "@material-ui/core/styles";
+import BottomNavigation from "@material-ui/core/BottomNavigation";
 import ClickAwayListener from "@material-ui/core/ClickAwayListener";
+import {createStyles, makeStyles, useTheme} from "@material-ui/core/styles";
+import BottomNavigationAction from "@material-ui/core/BottomNavigationAction";
 import SentimentSatisfiedAltIcon from "@material-ui/icons/SentimentSatisfied";
 import {usePopupState, bindTrigger, bindPopper} from "material-ui-popup-state/hooks"
 
 const useStyles = makeStyles(theme => createStyles({
-    emojiPickerContainer: {
-        "& > aside.emoji-picker-react": {
-            flexDirection: "column-reverse"
-        }
-    },
     messageTextField: {
         borderRadius: theme.spacing(2)
+    },
+    giphyPicker: {
+        width: "100%"
     }
 }))
 
+type BottomNavValType = "emoji" | "gif"
+
 const MessageTextFieldComponent: React.FC = (props) => {
     const classes = useStyles()
+    const theme = useTheme()
+    const bottomDrawer = useMediaQuery(theme.breakpoints.between("xs", "sm"))
+    const [bottomNavVal, setBottomNavVal] = React.useState<BottomNavValType>("emoji")
 
     const popupState = usePopupState({
         variant: "popper",
@@ -31,8 +39,12 @@ const MessageTextFieldComponent: React.FC = (props) => {
 
     const [text, setText] = React.useState("")
 
-    const handleOnChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const handleTextChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         setText(event.target.value)
+    }
+
+    const handleBottomNavChange = (event: React.ChangeEvent, newValue: BottomNavValType) => {
+        setBottomNavVal(newValue)
     }
 
     const handleOnKeyPress = (event: React.KeyboardEvent) => {
@@ -78,19 +90,19 @@ const MessageTextFieldComponent: React.FC = (props) => {
                 }}
                 rowsMax={5}
                 variant={"outlined"}
-                onChange={handleOnChange}
+                onChange={handleTextChange}
                 onKeyPress={handleOnKeyPress}
                 placeholder={"Type a message..."}
             />
 
-            <Popper
+            {!bottomDrawer && <Popper
                 transition
                 placement={"top-end"}
                 {...bindPopper(popupState)}
             >
                 {({TransitionProps}) => (
                     <Fade {...TransitionProps} timeout={350}>
-                        <span className={classes.emojiPickerContainer}>
+                        <span>
                             <ClickAwayListener onClickAway={handleClickAway}>
                                 <Picker
                                     title={""}
@@ -103,10 +115,64 @@ const MessageTextFieldComponent: React.FC = (props) => {
                         </span>
                     </Fade>
                 )}
+            </Popper>}
 
-            </Popper>
+
+            {bottomDrawer && <Drawer
+                anchor={"bottom"}
+                open={popupState.isOpen}
+                onClose={popupState.close}
+            >
+                <Fade
+                    mountOnEnter
+                    unmountOnExit
+                    in={bottomNavVal === "emoji"}
+                >
+                    <Picker
+                        style={{
+                            width: "100%"
+                        }}
+                        title={""}
+                        set={"facebook"}
+                        showPreview={false}
+                        emojiTooltip={false}
+                        onSelect={handleEmojiClick}
+                    />
+                </Fade>
+
+                <Fade
+                    mountOnEnter
+                    unmountOnExit
+                    in={bottomNavVal === "gif"}
+                >
+                    <span>
+                        {/*<GifPicker*/}
+                        {/*    onSelected={(gif) => {*/}
+                        {/*        console.log(gif)*/}
+                        {/*    }}*/}
+                        {/*    className={classes.giphyPicker}*/}
+                        {/*    apiKey={process.env.GIPHY_API_KEY}*/}
+                        {/*/>*/}
+                    </span>
+                </Fade>
+                <BottomNavigation
+                    value={bottomNavVal}
+                    onChange={handleBottomNavChange}
+                >
+                    <BottomNavigationAction
+                        value={"emoji"}
+                        icon={<SentimentSatisfiedAltIcon/>}
+                    />
+
+                    <BottomNavigationAction
+                        value={"gif"}
+                        icon={<GifIcon/>}
+                    />
+                </BottomNavigation>
+            </Drawer>}
         </>
-    );
+    )
+        ;
 };
 
 export default MessageTextFieldComponent;

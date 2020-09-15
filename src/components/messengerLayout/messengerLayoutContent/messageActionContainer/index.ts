@@ -1,4 +1,0 @@
-import MessageActionContainerComponent
-    from "@components/messengerLayout/messengerLayoutContent/messageActionContainer/MessageActionContainerComponent";
-
-export default MessageActionContainerComponent
