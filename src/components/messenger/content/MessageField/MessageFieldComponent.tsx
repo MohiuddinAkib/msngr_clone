@@ -2,11 +2,14 @@ import React from "react";
 import Fade from "@material-ui/core/Fade"
 import {BaseEmoji, Picker} from "emoji-mart"
 import GifIcon from "@material-ui/icons/Gif";
+import IGif from "@giphy/js-types/dist/gif";
 import Drawer from "@material-ui/core/Drawer";
 import Popper from "@material-ui/core/Popper";
+import Hidden from "@material-ui/core/Hidden";
 import TextField from "@material-ui/core/TextField";
 import IconButton from "@material-ui/core/IconButton";
 import useMediaQuery from "@material-ui/core/useMediaQuery";
+import {SearchContextManager} from "@giphy/react-components";
 import InputAdornment from "@material-ui/core/InputAdornment";
 import GifPickerComponent from "@components/common/GifPicker";
 import BottomNavigation from "@material-ui/core/BottomNavigation";
@@ -15,8 +18,6 @@ import {createStyles, makeStyles, useTheme} from "@material-ui/core/styles";
 import BottomNavigationAction from "@material-ui/core/BottomNavigationAction";
 import SentimentSatisfiedAltIcon from "@material-ui/icons/SentimentSatisfied";
 import {usePopupState, bindTrigger, bindPopper} from "material-ui-popup-state/hooks"
-import IGif from "@giphy/js-types/dist/gif";
-import {SearchContextManager} from "@giphy/react-components";
 
 const useStyles = makeStyles(theme => createStyles({
     messageTextField: {
@@ -32,7 +33,7 @@ type BottomNavValType = "emoji" | "gif"
 const MessageFieldComponent: React.FC = (props) => {
     const classes = useStyles()
     const theme = useTheme()
-    const bottomDrawer = useMediaQuery(theme.breakpoints.between("xs", "sm"))
+    const mobile = useMediaQuery(theme.breakpoints.between("xs", "sm"))
     const [bottomNavVal, setBottomNavVal] = React.useState<BottomNavValType>("emoji")
 
     const popupState = usePopupState({
@@ -52,7 +53,9 @@ const MessageFieldComponent: React.FC = (props) => {
 
     const handleOnKeyPress = (event: React.KeyboardEvent) => {
         if (event.key === "Enter") {
-            event.preventDefault()
+            if (!mobile) {
+                event.preventDefault()
+            }
         }
 
         if (event.shiftKey && event.key === "Enter") {
@@ -102,15 +105,23 @@ const MessageFieldComponent: React.FC = (props) => {
                 placeholder={"Type a message..."}
             />
 
-            {!bottomDrawer && <Popper
-                transition
-                placement={"top-end"}
-                {...bindPopper(popupState)}
+            <Hidden
+                smDown
             >
-                {({TransitionProps}) => (
-                    <Fade {...TransitionProps} timeout={350}>
+                <Popper
+                    transition
+                    placement={"top-end"}
+                    {...bindPopper(popupState)}
+                >
+                    {({TransitionProps}) => (
+                        <Fade
+                            timeout={350}
+                            {...TransitionProps}
+                        >
                         <span>
-                            <ClickAwayListener onClickAway={handleClickAway}>
+                            <ClickAwayListener
+                                onClickAway={handleClickAway}
+                            >
                                 <Picker
                                     title={""}
                                     set={"facebook"}
@@ -120,73 +131,64 @@ const MessageFieldComponent: React.FC = (props) => {
                                 />
                             </ClickAwayListener>
                         </span>
-                    </Fade>
-                )}
-            </Popper>}
+                        </Fade>
+                    )}
+                </Popper>
+            </Hidden>
 
-
-            {bottomDrawer && <Drawer
-                anchor={"bottom"}
-                open={popupState.isOpen}
-                onClose={popupState.close}
+            <Hidden
+                lgUp
             >
-                <Fade
-                    mountOnEnter
-                    unmountOnExit
-                    in={bottomNavVal === "emoji"}
+                <Drawer
+                    anchor={"bottom"}
+                    open={popupState.isOpen}
+                    onClose={popupState.close}
                 >
-                    <Picker
-                        style={{
-                            width: "100%"
-                        }}
-                        title={""}
-                        set={"facebook"}
-                        showPreview={false}
-                        emojiTooltip={false}
-                        onSelect={handleEmojiClick}
-                    />
-                </Fade>
-
-                <Fade
-                    mountOnEnter
-                    unmountOnExit
-                    in={bottomNavVal === "gif"}
-                >
-                    <span>
-                         <SearchContextManager
-                             initialTerm={"vegeta"}
-                             apiKey={process.env.NEXT_PUBLIC_GIPHY_SDK_API_KEY}
-                             options={{
-                                 type: "stickers",
-
-                             }}
-                         >
-                        <GifPickerComponent
-                            width={window.innerWidth}
-                            onGifClick={handleGifClick}
-                            // className={classes.giphyPicker}
+                    {
+                        bottomNavVal === "emoji" && <Picker
+                            style={{
+                                width: "100%"
+                            }}
+                            title={""}
+                            set={"facebook"}
+                            showPreview={false}
+                            emojiTooltip={false}
+                            onSelect={handleEmojiClick}
                         />
-                         </SearchContextManager>
-                    </span>
-                </Fade>
-                <BottomNavigation
-                    value={bottomNavVal}
-                    onChange={handleBottomNavChange}
-                >
-                    <BottomNavigationAction
-                        value={"emoji"}
-                        icon={<SentimentSatisfiedAltIcon/>}
-                    />
+                    }
 
-                    <BottomNavigationAction
-                        value={"gif"}
-                        icon={<GifIcon/>}
-                    />
-                </BottomNavigation>
-            </Drawer>}
+                    {/*</Fade>*/}
+
+
+                    {bottomNavVal === "gif" && <span>
+                             <SearchContextManager
+                                 initialTerm={"vegeta"}
+                                 apiKey={process.env.NEXT_PUBLIC_GIPHY_SDK_API_KEY}
+                             >
+                            <GifPickerComponent
+                                onGifClick={handleGifClick}
+                                width={typeof window !== 'undefined' ? window.innerWidth : 0}
+                            />
+                             </SearchContextManager>
+                        </span>}
+                    <BottomNavigation
+                        value={bottomNavVal}
+                        onChange={handleBottomNavChange}
+                    >
+                        <BottomNavigationAction
+                            value={"emoji"}
+                            icon={<SentimentSatisfiedAltIcon/>}
+                        />
+
+                        <BottomNavigationAction
+                            value={"gif"}
+                            icon={<GifIcon/>}
+                        />
+                    </BottomNavigation>
+                </Drawer>
+            </Hidden>
         </>
-    )
-        ;
+    );
 };
 
 export default MessageFieldComponent;

@@ -16,6 +16,8 @@
     "@reduxjs/toolkit": "^1.4.0",
     "emoji-mart": "^3.0.0",
     "firebase": "^7.19.1",
+    "formik": "^2.1.5",
+    "formik-material-ui": "^3.0.0",
     "material-ui-popup-state": "^1.6.1",
     "next": "9.4.4",
     "next-redux-wrapper": "^6.0.2",

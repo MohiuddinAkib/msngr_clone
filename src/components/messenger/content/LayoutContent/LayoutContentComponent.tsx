@@ -20,15 +20,23 @@ const LayoutContentComponent: React.FC = (props) => {
                 elevation={0}
                 component={Card}
                 direction={"column"}
-                alignItems={"stretch"}
+                // justify={"flex-start"}
+                // alignContent={"stretch"}
             >
-                <Grid item component={Box} flex={1}>
+                <Grid
+                    item
+                    flex={1}
+                    component={Box}
+                >
                     <CardContent>
                         {props.children}
                     </CardContent>
                 </Grid>
 
-                <Grid item component={CardActions}>
+                <Grid
+                    item
+                    component={CardActions}
+                >
                     <MessageActionContainerComponent/>
                 </Grid>
             </Grid>
