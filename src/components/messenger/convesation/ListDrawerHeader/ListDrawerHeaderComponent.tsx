@@ -1,17 +1,23 @@
 import React from "react";
 import propTypes from "prop-types"
+import {useRouter} from "next/router";
+import {useSelector} from "react-redux";
 import Grid from "@material-ui/core/Grid";
 import List from "@material-ui/core/List";
 import Slide from "@material-ui/core/Slide";
+import {Profile} from "@store/rootReducer";
 import Avatar from "@material-ui/core/Avatar";
 import AppBar from "@material-ui/core/AppBar";
 import Hidden from "@material-ui/core/Hidden";
 import Dialog from "@material-ui/core/Dialog";
 import Switch from "@material-ui/core/Switch";
 import Toolbar from "@material-ui/core/Toolbar";
+import {RootState} from "@store/configureStore";
 import ListItem from "@material-ui/core/ListItem";
+import Skeleton from '@material-ui/lab/Skeleton';
 import CreateIcon from "@material-ui/icons/Create";
 import Typography from "@material-ui/core/Typography";
+import {useErrorHandler} from "react-error-boundary";
 import IconButton from "@material-ui/core/IconButton";
 import SettingsIcon from "@material-ui/icons/Settings";
 import {MessengerContext} from "@src/context/messenger";
@@ -27,6 +33,7 @@ import AccountCircleIcon from '@material-ui/icons/AccountCircle';
 import {createStyles, makeStyles} from "@material-ui/core/styles";
 import FiberManualRecordIcon from '@material-ui/icons/FiberManualRecord';
 import {TransitionProps} from "@material-ui/core/transitions/transition";
+import {FirebaseReducer, isLoaded, useFirebase} from "react-redux-firebase";
 import ListItemSecondaryAction from "@material-ui/core/ListItemSecondaryAction";
 
 interface Props {
@@ -63,10 +70,14 @@ const Transition = React.forwardRef(function Transition(
 
 const ListDrawerHeaderComponent: React.FC<Props> = (props) => {
     const theme = useTheme()
+    const router = useRouter()
     const classes = useStyles()
+    const firebase = useFirebase()
+    const handleError = useErrorHandler()
     const messengerContext = React.useContext(MessengerContext)
     const atMdAndLg = useMediaQuery(theme.breakpoints.between("md", "lg"))
     const [openProfileMenu, setOpenProfileMenu] = React.useState(false)
+    const profile = useSelector<RootState, FirebaseReducer.Profile<Profile>>(state => state.firebase.profile)
 
     const showProfileMenu = () => {
         setOpenProfileMenu(true)
@@ -74,6 +85,15 @@ const ListDrawerHeaderComponent: React.FC<Props> = (props) => {
 
     const hideProfileMenu = () => {
         setOpenProfileMenu(false)
+    }
+
+    const handleLogout = async () => {
+        try {
+            await firebase.logout()
+            router.replace("/login")
+        } catch (error) {
+            handleError(error)
+        }
     }
 
     return (
@@ -154,12 +174,12 @@ const ListDrawerHeaderComponent: React.FC<Props> = (props) => {
                         src={"https://picsum.photos/200/300?grayscale&random=2"}
                     />
 
-                    <Typography
+                    {!isLoaded(profile) ? <Skeleton variant="text"/> : <Typography
                         variant={"h4"}
                         align={"center"}
                     >
-                        Md Akib
-                    </Typography>
+                        {profile.first_name} {profile.last_name}
+                    </Typography>}
 
                     <List>
                         <ListItem
@@ -217,6 +237,7 @@ const ListDrawerHeaderComponent: React.FC<Props> = (props) => {
 
                         <ListItem
                             button
+                            onClick={handleLogout}
                         >
                             <ListItemIcon>
                                 <ExitToAppIcon/>

@@ -58,7 +58,7 @@ const Register: NextPage = () => {
         try {
             const {email, password, ...profile} = values
             await firebase.createUser({email, password}, profile)
-            router.replace("/index")
+            router.replace("/messages")
         } catch (e) {
             handleError(e)
         }

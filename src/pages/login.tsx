@@ -13,6 +13,9 @@ import CardContent from "@material-ui/core/CardContent";
 import CardActions from "@material-ui/core/CardActions";
 import LockOutlinedIcon from '@material-ui/icons/LockOutlined';
 import {makeStyles, createStyles} from "@material-ui/core/styles";
+import {useFirebase} from "react-redux-firebase";
+import {useErrorHandler} from "react-error-boundary";
+import {useRouter} from "next/router";
 
 const useStyles = makeStyles((theme) => createStyles({
     container: {
@@ -39,15 +42,23 @@ const useStyles = makeStyles((theme) => createStyles({
 }));
 
 const Login: NextPage = () => {
+    const router = useRouter()
     const classes = useStyles();
+    const firebase = useFirebase()
+    const handleError = useErrorHandler()
 
     const initialValues = {
         email: "",
         password: "",
     }
 
-    const handleFormSubmit = (values: typeof initialValues) => {
-        console.log(values)
+    const handleFormSubmit = async (values: typeof initialValues) => {
+        try {
+            await firebase.login(values)
+            router.replace("/messages")
+        } catch (e) {
+            handleError(e)
+        }
     }
 
     return (

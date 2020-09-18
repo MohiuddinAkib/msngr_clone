@@ -14,7 +14,7 @@ const Content = getContent(styled);
 const LayoutContentComponent: React.FC = (props) => {
     const messengerContext = React.useContext(MessengerContext)
 
-    return messengerContext.mountContent && (
+    return (
         <Content>
             <Grid
                 square

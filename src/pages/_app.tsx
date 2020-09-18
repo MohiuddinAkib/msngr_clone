@@ -48,7 +48,6 @@ const MyApp: React.FC<AppProps> = (props) => {
                     content="minimum-scale=1, initial-scale=1, width=device-width"
                 />
             </Head>
-            {/* CssBaseline kickstart an elegant, consistent, and simple baseline to build upon. */}
             <CssBaseline/>
             <ReactReduxContext.Consumer>
                 {
@@ -58,6 +57,8 @@ const MyApp: React.FC<AppProps> = (props) => {
                         <ReactReduxFirebaseProvider
                             config={{
                                 userProfile: "users",
+                                presence: "presence",
+                                sessions: "sessions",
                                 useFirestoreForProfile: true,
                                 useFirestoreForStorageMeta: true,
                             }}

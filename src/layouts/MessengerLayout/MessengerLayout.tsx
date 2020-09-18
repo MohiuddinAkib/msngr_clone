@@ -23,6 +23,77 @@ scheme.configureHeader(builder => {
         })
 })
 
+scheme.configureEdgeSidebar(builder => {
+    builder
+        .create("right_sidebar", {anchor: "right"})
+        .registerPersistentConfig("md", {
+            width: 300,
+            collapsible: true,
+            autoExpanded: true,
+            headerMagnetEnabled: true,
+            persistentBehavior: "fit",
+        })
+        .registerPersistentConfig("lg", {
+            width: 360,
+            collapsible: true,
+            autoExpanded: true,
+            headerMagnetEnabled: true,
+            persistentBehavior: "fit",
+        })
+        .registerPersistentConfig("xl", {
+            width: 420,
+            collapsible: true,
+            autoExpanded: true,
+            headerMagnetEnabled: true,
+            persistentBehavior: "fit",
+        })
+
+
+    builder
+        .create(
+            "left_sidebar",
+            {
+                anchor: "left",
+            })
+        .registerPermanentConfig(
+            "xs",
+            {
+                width: "100vw",
+                collapsible: false,
+                autoExpanded: true,
+            })
+        .registerPermanentConfig(
+            "md",
+            {
+                width: 300,
+                collapsible: false,
+                autoExpanded: true,
+            })
+        .registerPermanentConfig(
+            "lg",
+            {
+                width: "25vw",
+                collapsible: false,
+                autoExpanded: true,
+            })
+        .registerPermanentConfig(
+            "xl",
+            {
+                width: 420,
+                collapsible: false,
+                autoExpanded: true,
+            })
+
+})
+
+scheme.configureEdgeSidebar(builder => {
+    builder
+        .create("right_sidebar", {anchor: "right"})
+        .registerTemporaryConfig("xs", {
+            width: "100%",
+        });
+
+})
 
 const MessengerLayout: React.FC = (props) => {
     const messengerContext = React.useContext(MessengerContext)
@@ -36,80 +107,11 @@ const MessengerLayout: React.FC = (props) => {
         ,
         [messengerContext.darkMode])
 
-    scheme.configureEdgeSidebar(builder => {
-        builder
-            .create("right_sidebar", {anchor: "right"})
-            .registerTemporaryConfig("xs", {
-                width: "100%",
-            });
 
+    scheme.configureEdgeSidebar(builder => {
         builder.hide("right_sidebar", !messengerContext.mountInfoListDrawer)
-    })
-
-    scheme.configureEdgeSidebar(builder => {
-        builder
-            .create("right_sidebar", {anchor: "right"})
-            .registerPersistentConfig("md", {
-                width: 300,
-                collapsible: true,
-                autoExpanded: true,
-                headerMagnetEnabled: true,
-                persistentBehavior: "fit",
-            })
-            .registerPersistentConfig("lg", {
-                width: 360,
-                collapsible: true,
-                autoExpanded: true,
-                headerMagnetEnabled: true,
-                persistentBehavior: "fit",
-            })
-            .registerPersistentConfig("xl", {
-                width: 420,
-                collapsible: true,
-                autoExpanded: true,
-                headerMagnetEnabled: true,
-                persistentBehavior: "fit",
-            })
-
-
-        builder
-            .create(
-                "left_sidebar",
-                {
-                    anchor: "left",
-                })
-            .registerPermanentConfig(
-                "xs",
-                {
-                    width: "100vw",
-                    collapsible: false,
-                    autoExpanded: true,
-                })
-            .registerPermanentConfig(
-                "md",
-                {
-                    width: 300,
-                    collapsible: false,
-                    autoExpanded: true,
-                })
-            .registerPermanentConfig(
-                "lg",
-                {
-                    width: "25vw",
-                    collapsible: false,
-                    autoExpanded: true,
-                })
-            .registerPermanentConfig(
-                "xl",
-                {
-                    width: 420,
-                    collapsible: false,
-                    autoExpanded: true,
-                })
-
         builder.hide("left_sidebar", !messengerContext.mountConversationListDrawer)
     })
-
 
     return (
         <Fullscreen>

@@ -21,6 +21,13 @@ const MessengerProvider: React.FC = (props) => {
             setMountInfoListDrawer(true)
             setMountConversationListDrawer(true)
         }
+
+        return () => {
+            setMountContent(false)
+            setMountMainHeader(false)
+            setMountInfoListDrawer(false)
+            setMountConversationListDrawer(false)
+        }
     }, [pc])
 
     const toggleDarkMode = () => {

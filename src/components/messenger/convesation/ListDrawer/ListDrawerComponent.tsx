@@ -8,10 +8,10 @@ import {getDrawerSidebar} from "@mui-treasury/layout";
 import {MessengerContext} from "@src/context/messenger";
 import {createStyles, makeStyles} from "@material-ui/core/styles";
 import BottomNavigation from "@material-ui/core/BottomNavigation";
+import PeopleListComponent from "@containers/messenger/PeopleList";
 import ConversationListComponent from "@containers/messenger/ConversationList";
 import BottomNavigationAction from "@material-ui/core/BottomNavigationAction";
 import ListDrawerHeaderComponent from "@components/messenger/convesation/ListDrawerHeader";
-import PeopleListComponent from "@containers/messenger/PeopleList";
 
 const DrawerSidebar = getDrawerSidebar(styled);
 
@@ -49,7 +49,6 @@ const ListDrawerComponent: React.FC = (props) => {
     }
 
 
-    // return messengerContext.mountConversationListDrawer && (
     return (
         <DrawerSidebar
             sidebarId={"left_sidebar"}

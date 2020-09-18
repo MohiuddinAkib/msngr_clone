@@ -64,9 +64,11 @@ const InfoListDrawerComponent: React.FC = (props) => {
         setShowPrivacyAndPolicy(prevState => !prevState)
     }
 
-    // return messengerContext.mountInfoListDrawer && (
     return (
-        <Sidebar sidebarId={"right_sidebar"} classes={{paper: classes.infoDrawerPaper}}>
+        <Sidebar
+            sidebarId={"right_sidebar"}
+            classes={{paper: classes.infoDrawerPaper}}
+        >
             <Toolbar/>
             <SidebarContent>
                 <CardContent>
