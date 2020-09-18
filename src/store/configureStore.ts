@@ -10,6 +10,7 @@ import {MakeStore, createWrapper, Context, HYDRATE} from 'next-redux-wrapper';
 const store = configureStore({
     reducer: rootReducer,
     middleware: getDefaultMiddleware => getDefaultMiddleware({
+        serializableCheck: false,
         thunk: {
             extraArgument: {getFirestore, getFirebase}
         }

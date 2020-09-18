@@ -1,8 +1,19 @@
 import {combineReducers} from "@reduxjs/toolkit"
 import {firestoreReducer} from "redux-firestore";
-import {firebaseReducer} from "react-redux-firebase";
+import {FirebaseReducer, firebaseReducer, FirestoreReducer} from "react-redux-firebase";
 
-export default combineReducers({
+interface Profile {
+
+}
+
+interface Schema {
+
+}
+
+export default combineReducers<{
+    firebase: FirebaseReducer.Reducer<Profile, Schema>,
+    firestore: FirestoreReducer.Reducer
+}>({
     firebase: firebaseReducer,
     firestore: firestoreReducer,
 })

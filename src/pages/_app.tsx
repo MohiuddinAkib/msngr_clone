@@ -12,6 +12,7 @@ import {createFirestoreInstance} from "redux-firestore"
 import {RootState, wrapper} from "@store/configureStore";
 import {ReactReduxFirebaseProvider} from "react-redux-firebase"
 import {ErrorBoundary, FallbackProps} from "react-error-boundary"
+import AuthIsLoadedComponent from "@components/auth/AuthIsLoaded";
 
 
 const ErrorFallback: React.FC<FallbackProps> = ({error, resetErrorBoundary}) => {
@@ -56,8 +57,9 @@ const MyApp: React.FC<AppProps> = (props) => {
                     ) => (
                         <ReactReduxFirebaseProvider
                             config={{
+                                userProfile: "users",
                                 useFirestoreForProfile: true,
-                                useFirestoreForStorageMeta: true
+                                useFirestoreForStorageMeta: true,
                             }}
                             initializeAuth
                             firebase={firebase}
@@ -68,7 +70,9 @@ const MyApp: React.FC<AppProps> = (props) => {
                                 onReset={resetErrorBoundary}
                                 FallbackComponent={ErrorFallback}
                             >
-                                <Component {...pageProps} />
+                                <AuthIsLoadedComponent>
+                                    <Component {...pageProps} />
+                                </AuthIsLoadedComponent>
                             </ErrorBoundary>
                         </ReactReduxFirebaseProvider>
                     )

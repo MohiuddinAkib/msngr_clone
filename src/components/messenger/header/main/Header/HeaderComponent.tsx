@@ -2,12 +2,18 @@ import React from "react";
 import styled from "styled-components";
 import Grid from "@material-ui/core/Grid";
 import Avatar from "@material-ui/core/Avatar";
+import Hidden from "@material-ui/core/Hidden";
 import {getHeader} from "@mui-treasury/layout";
 import Toolbar from "@material-ui/core/Toolbar";
+import IconButton from "@material-ui/core/IconButton";
+import {getSidebarTrigger} from "@mui-treasury/layout";
+import {MessengerContext} from "@src/context/messenger";
+import ArrowBackIcon from '@material-ui/icons/ArrowBack';
 import {createStyles, makeStyles} from "@material-ui/core/styles";
 import ActionBtnsComponent from "@components/messenger/header/main/ActionBtns";
 
 const Header = getHeader(styled);
+const SidebarTrigger = getSidebarTrigger(styled)
 
 const useStyles = makeStyles((theme) => createStyles({
     appBar: {
@@ -28,13 +34,46 @@ const useStyles = makeStyles((theme) => createStyles({
 
 const HeaderComponent: React.FC = (props) => {
     const classes = useStyles();
+    const messengerContext = React.useContext(MessengerContext)
 
-    return (
-        <Header elevation={1} className={classes.appBar}>
+    return messengerContext.mountMainHeader && (
+        <Header
+            elevation={1}
+            className={classes.appBar}
+        >
             <Toolbar>
-                <Grid container justify={"space-between"} alignItems={"center"}>
+                <Grid
+                    container
+                    alignItems={"center"}
+                    justify={"space-between"}
+                >
                     <Grid item>
-                        <Avatar alt={"john doe"} src={"https://picsum.photos/200/300?grayscale&random=2"}/>
+                        <Hidden
+                            lgUp
+                        >
+                            <IconButton
+                                onClick={messengerContext.handleMessageComponentsVisibility}
+                            >
+                                <ArrowBackIcon/>
+                            </IconButton>
+                            <SidebarTrigger sidebarId={"right_sidebar"} color={"primary"}>
+                                {({open, anchor}) => {
+                                    return <Avatar
+                                        alt={"john doe"}
+                                        src={"https://picsum.photos/200/300?grayscale&random=2"}
+                                    />
+                                }}
+                            </SidebarTrigger>
+                        </Hidden>
+
+                        <Hidden
+                            smDown
+                        >
+                            <Avatar
+                                alt={"john doe"}
+                                src={"https://picsum.photos/200/300?grayscale&random=2"}
+                            />
+                        </Hidden>
                     </Grid>
                     <Grid item>
                         <ActionBtnsComponent/>

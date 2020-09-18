@@ -6,7 +6,8 @@ import IconButton from "@material-ui/core/IconButton";
 import ListSubheader from "@material-ui/core/ListSubheader";
 import InputAdornment from "@material-ui/core/InputAdornment";
 import {createStyles, makeStyles} from "@material-ui/core/styles";
-import ListItemComponent from "@components/messenger/convesation/ListItem";
+import ListItem from "@material-ui/core/ListItem";
+import ListItemText from "@material-ui/core/ListItemText";
 
 const useStyles = makeStyles(theme => createStyles({
     textFieldRoot: {
@@ -20,7 +21,7 @@ const useStyles = makeStyles(theme => createStyles({
     }
 }))
 
-const ConversationListComponent: React.FC = () => {
+const PeopleListComponent: React.FC = () => {
     const classes = useStyles()
 
     return (
@@ -46,37 +47,13 @@ const ConversationListComponent: React.FC = () => {
                 />
             </ListSubheader>
         }>
-            <ListItemComponent/>
-            <ListItemComponent/>
-            <ListItemComponent/>
-            <ListItemComponent/>
-            <ListItemComponent/>
-            <ListItemComponent/>
-            <ListItemComponent/>
-            <ListItemComponent/>
-            <ListItemComponent/>
-            <ListItemComponent/>
-            <ListItemComponent/>
-            <ListItemComponent/>
-            <ListItemComponent/>
-            <ListItemComponent/>
-            <ListItemComponent/>
-            <ListItemComponent/>
-            <ListItemComponent/>
-            <ListItemComponent/>
-            <ListItemComponent/>
-            <ListItemComponent/>
-            <ListItemComponent/>
-            <ListItemComponent/>
-            <ListItemComponent/>
-            <ListItemComponent/>
-            <ListItemComponent/>
-            <ListItemComponent/>
-            <ListItemComponent/>
-            <ListItemComponent/>
-            <ListItemComponent/>
+            <ListItem>
+                <ListItemText
+                    primary={"People one"}
+                />
+            </ListItem>
         </List>
     );
 };
 
-export default ConversationListComponent;
+export default PeopleListComponent;

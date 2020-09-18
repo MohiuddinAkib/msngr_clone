@@ -27,6 +27,7 @@ const useStyles = makeStyles((theme) => createStyles({
     avatar: {
         backgroundColor: theme.palette.secondary.main,
         margin: "auto",
+        marginBottom: theme.spacing(1),
     },
     form: {
         width: '100%', // Fix IE 11 issue.
@@ -39,6 +40,15 @@ const useStyles = makeStyles((theme) => createStyles({
 
 const Login: NextPage = () => {
     const classes = useStyles();
+
+    const initialValues = {
+        email: "",
+        password: "",
+    }
+
+    const handleFormSubmit = (values: typeof initialValues) => {
+        console.log(values)
+    }
 
     return (
         <AuthLayout>
@@ -69,12 +79,8 @@ const Login: NextPage = () => {
                             </Typography>
 
                             <Formik
-                                initialValues={{
-                                    email: "",
-                                    password: ""
-                                }}
-                                onSubmit={() => {
-                                }}
+                                initialValues={initialValues}
+                                onSubmit={handleFormSubmit}
                             >
                                 <Form
                                     className={classes.form}
@@ -128,13 +134,12 @@ const Login: NextPage = () => {
                                     <NextLink
                                         href={"/forgot-password"}
                                     >
-                                        {/*<Link*/}
-                                        {/*    variant="body2"*/}
-                                        {/*>*/}
-                                        <a>
+                                        <Typography
+                                            component={"a"}
+                                            variant={"body2"}
+                                        >
                                             Forgot password?
-                                        </a>
-                                        {/*</Link>*/}
+                                        </Typography>
                                     </NextLink>
                                 </Grid>
                                 <Grid
@@ -143,11 +148,12 @@ const Login: NextPage = () => {
                                     <NextLink
                                         href={"/register"}
                                     >
-                                        {/*<Link*/}
-                                        {/*    variant="body2"*/}
-                                        {/*>*/}
-                                        <a>Don't have an account? Sign Up</a>
-                                        {/*</Link>*/}
+                                        <Typography
+                                            component={"a"}
+                                            variant={"body2"}
+                                        >
+                                            Don't have an account? Sign Up
+                                        </Typography>
                                     </NextLink>
                                 </Grid>
                             </Grid>

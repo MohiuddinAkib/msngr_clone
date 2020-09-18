@@ -6,13 +6,15 @@ import Card from "@material-ui/core/Card";
 import {getContent} from "@mui-treasury/layout";
 import CardContent from "@material-ui/core/CardContent";
 import CardActions from "@material-ui/core/CardActions";
+import {MessengerContext} from "@src/context/messenger";
 import MessageActionContainerComponent from "@components/messenger/content/ActionContainer";
 
 const Content = getContent(styled);
 
 const LayoutContentComponent: React.FC = (props) => {
+    const messengerContext = React.useContext(MessengerContext)
 
-    return (
+    return messengerContext.mountContent && (
         <Content>
             <Grid
                 square
@@ -20,8 +22,6 @@ const LayoutContentComponent: React.FC = (props) => {
                 elevation={0}
                 component={Card}
                 direction={"column"}
-                // justify={"flex-start"}
-                // alignContent={"stretch"}
             >
                 <Grid
                     item

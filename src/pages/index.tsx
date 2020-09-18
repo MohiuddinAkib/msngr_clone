@@ -1,17 +1,25 @@
-import React from "react"
+// @generated: @expo/next-adapter@2.1.29
+import React from "react";
 import {NextPage} from "next";
-import MessengerLayout from "@src/layouts/MessengerLayout";
+import {StyleSheet, Text, View} from "react-native";
 
-const Home: NextPage = (props) => {
-    React.useEffect(() => {
 
-    }, [])
+const App: NextPage = () => {
 
     return (
-        <MessengerLayout>
-            hello
-        </MessengerLayout>
+        <View
+        >
+            <Text
+                style={styles.text}
+            >
+                Welcome to Expo + Next.js 👋
+            </Text>
+        </View>
     );
-};
+}
 
-export default Home;
+export default App
+
+const styles = StyleSheet.create({
+    text: {}
+})

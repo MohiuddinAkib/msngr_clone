@@ -19,6 +19,9 @@
     "jsx": "preserve",
     "baseUrl": ".",
     "paths": {
+      "@hooks/*": [
+        "./src/hooks/*"
+      ],
       "@components/*": [
         "./src/components/*"
       ],
@@ -48,3 +51,6 @@
     "**/*.tsx"
   ]
 }
+
+
+

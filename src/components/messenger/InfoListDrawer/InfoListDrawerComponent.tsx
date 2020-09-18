@@ -24,6 +24,7 @@ import KeyboardArrowLeftIcon from "@material-ui/icons/KeyboardArrowLeft";
 import {createStyles, makeStyles, useTheme} from "@material-ui/core/styles";
 import ListItemSecondaryAction from "@material-ui/core/ListItemSecondaryAction";
 import {getDrawerSidebar, getSwipeableSidebar, getSidebarContent} from "@mui-treasury/layout";
+import {MessengerContext} from "@src/context/messenger";
 
 const DrawerSidebar = getDrawerSidebar(styled);
 const SidebarContent = getSidebarContent(styled)
@@ -47,8 +48,9 @@ const useStyles = makeStyles(theme => createStyles({
 
 const InfoListDrawerComponent: React.FC = (props) => {
     const theme = useTheme()
-    const mobile = useMediaQuery(theme.breakpoints.between("xs", "sm"))
     const classes = useStyles()
+    const messengerContext = React.useContext(MessengerContext)
+    const mobile = useMediaQuery(theme.breakpoints.between("xs", "sm"))
     const [showMoreActions, setShowMoreActions] = React.useState(false)
     const [showPrivacyAndPolicy, setShowPrivacyAndPolicy] = React.useState(false)
 
@@ -62,6 +64,7 @@ const InfoListDrawerComponent: React.FC = (props) => {
         setShowPrivacyAndPolicy(prevState => !prevState)
     }
 
+    // return messengerContext.mountInfoListDrawer && (
     return (
         <Sidebar sidebarId={"right_sidebar"} classes={{paper: classes.infoDrawerPaper}}>
             <Toolbar/>

@@ -1,3 +1,3 @@
-import MessengerLayout from "@src/layouts/MessengerLayout/MessengerLayout";
+import MessengerLayout from "./MessengerLayout";
 
 export default MessengerLayout
