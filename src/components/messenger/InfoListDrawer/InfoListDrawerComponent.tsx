@@ -16,19 +16,19 @@ import CardHeader from "@material-ui/core/CardHeader";
 import CardContent from "@material-ui/core/CardContent";
 import ReportOffIcon from "@material-ui/icons/ReportOff";
 import ListItemText from "@material-ui/core/ListItemText";
+import ArrowBackIcon from "@material-ui/icons/ArrowBack";
 import ExpandMoreIcon from "@material-ui/icons/ExpandMore";
 import TripOriginIcon from "@material-ui/icons/TripOrigin";
-import useMediaQuery from "@material-ui/core/useMediaQuery";
 import NotificationsIcon from "@material-ui/icons/Notifications";
 import KeyboardArrowLeftIcon from "@material-ui/icons/KeyboardArrowLeft";
 import {createStyles, makeStyles, useTheme} from "@material-ui/core/styles";
 import ListItemSecondaryAction from "@material-ui/core/ListItemSecondaryAction";
-import {getDrawerSidebar, getSwipeableSidebar, getSidebarContent} from "@mui-treasury/layout";
-import {MessengerContext} from "@src/context/messenger";
+import {getSidebarContent, getDrawerSidebar, getSidebarTrigger, getHeader} from "@mui-treasury/layout";
 
+const Header = getHeader(styled);
 const DrawerSidebar = getDrawerSidebar(styled);
 const SidebarContent = getSidebarContent(styled)
-const SwipeableSidebar = getSwipeableSidebar(styled);
+const SidebarTrigger = getSidebarTrigger(styled)
 
 const useStyles = makeStyles(theme => createStyles({
     infoDrawerPaper: {},
@@ -49,12 +49,8 @@ const useStyles = makeStyles(theme => createStyles({
 const InfoListDrawerComponent: React.FC = (props) => {
     const theme = useTheme()
     const classes = useStyles()
-    const messengerContext = React.useContext(MessengerContext)
-    const mobile = useMediaQuery(theme.breakpoints.between("xs", "sm"))
     const [showMoreActions, setShowMoreActions] = React.useState(false)
     const [showPrivacyAndPolicy, setShowPrivacyAndPolicy] = React.useState(false)
-
-    const Sidebar = mobile ? SwipeableSidebar : DrawerSidebar
 
     const handleMoreActionsCollapse = () => {
         setShowMoreActions(prevState => !prevState)
@@ -65,12 +61,21 @@ const InfoListDrawerComponent: React.FC = (props) => {
     }
 
     return (
-        <Sidebar
+        <DrawerSidebar
             sidebarId={"right_sidebar"}
             classes={{paper: classes.infoDrawerPaper}}
         >
-            <Toolbar/>
             <SidebarContent>
+                <SidebarTrigger
+                    color={"primary"}
+                    sidebarId="left_sidebar"
+                >
+                    {({open, anchor}) => {
+                        return <ArrowBackIcon/>
+                    }}
+                </SidebarTrigger>
+
+                <Toolbar/>
                 <CardContent>
                     <Avatar
                         className={classes.profileAvatar}
@@ -207,7 +212,7 @@ const InfoListDrawerComponent: React.FC = (props) => {
                     </Collapse>
                 </List>
             </SidebarContent>
-        </Sidebar>
+        </DrawerSidebar>
     );
 };
 

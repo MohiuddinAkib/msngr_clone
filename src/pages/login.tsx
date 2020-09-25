@@ -55,7 +55,9 @@ const Login: NextPage = () => {
     const handleFormSubmit = async (values: typeof initialValues) => {
         try {
             await firebase.login(values)
-            router.replace("/messages")
+            const redirecPath = router.query.next as string || "/"
+
+            router.replace(redirecPath)
         } catch (e) {
             handleError(e)
         }

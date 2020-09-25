@@ -1,15 +1,17 @@
 import {useDispatch} from "react-redux";
+import firebase from "@config/firebase"
 import rootReducer from "@store/rootReducer";
-import {getFirestore} from "redux-firestore";
-import {getFirebase, actionTypes as rrfActionTypes} from "react-redux-firebase";
 import {constants as rfConstants} from "redux-firestore"
+import {getFirestore, reduxFirestore} from "redux-firestore";
 import {configureStore, ThunkAction, Action} from "@reduxjs/toolkit";
+import {getFirebase, actionTypes as rrfActionTypes} from "react-redux-firebase";
 
 
 import {MakeStore, createWrapper, Context, HYDRATE} from "next-redux-wrapper";
 
 const store = configureStore({
     reducer: rootReducer,
+    enhancers: defaultEnhancers => defaultEnhancers.concat(reduxFirestore(firebase as any)),
     middleware: getDefaultMiddleware => getDefaultMiddleware({
         immutableCheck: {
             ignoredPaths: ["firebase", "firestore"],

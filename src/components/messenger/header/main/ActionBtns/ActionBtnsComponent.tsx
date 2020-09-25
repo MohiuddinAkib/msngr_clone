@@ -12,15 +12,22 @@ const SidebarTrigger = getSidebarTrigger(styled)
 const ActionBtnsComponent = () => {
     return (
         <>
-            <IconButton color={"primary"}>
+            <IconButton
+                color={"primary"}
+            >
                 <PhoneIcon/>
             </IconButton>
 
-            <IconButton color={"primary"}>
+            <IconButton
+                color={"primary"}
+            >
                 <VideoCallIcon/>
             </IconButton>
 
-            <SidebarTrigger sidebarId={"right_sidebar"} color={"primary"}>
+            <SidebarTrigger
+                color={"primary"}
+                sidebarId={"right_sidebar"}
+            >
                 {({open, anchor}) => {
                     if (!open) return <InfoIcon/>
                     if (anchor === "left") return <InfoIcon/>

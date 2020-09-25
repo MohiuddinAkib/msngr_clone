@@ -1,6 +1,7 @@
 import React from "react";
 import Head from "next/head"
 import styled from "styled-components";
+import {SafeAreaView} from "react-native";
 import CssBaseline from "@material-ui/core/CssBaseline";
 import {MessengerContext} from "@src/context/messenger";
 import Layout, {Root, getFullscreen} from "@mui-treasury/layout";
@@ -12,15 +13,24 @@ const Fullscreen = getFullscreen(styled)
 scheme.configureHeader(builder => {
     builder
         .registerConfig("xs", {
-            position: "absolute",
+            position: "relative",
             clipped: false
         })
 
     builder
         .registerConfig("md", {
             initialHeight: 64,
-            position: "absolute",
+            position: "relative",
         })
+})
+
+
+scheme.configureEdgeSidebar(builder => {
+    builder
+        .create("right_sidebar", {anchor: "right"})
+        .registerTemporaryConfig("xs", {
+            width: "100vw",
+        });
 })
 
 scheme.configureEdgeSidebar(builder => {
@@ -55,12 +65,10 @@ scheme.configureEdgeSidebar(builder => {
             {
                 anchor: "left",
             })
-        .registerPermanentConfig(
+        .registerTemporaryConfig(
             "xs",
             {
                 width: "100vw",
-                collapsible: false,
-                autoExpanded: true,
             })
         .registerPermanentConfig(
             "md",
@@ -86,14 +94,6 @@ scheme.configureEdgeSidebar(builder => {
 
 })
 
-scheme.configureEdgeSidebar(builder => {
-    builder
-        .create("right_sidebar", {anchor: "right"})
-        .registerTemporaryConfig("xs", {
-            width: "100%",
-        });
-
-})
 
 const MessengerLayout: React.FC = (props) => {
     const messengerContext = React.useContext(MessengerContext)
@@ -107,26 +107,22 @@ const MessengerLayout: React.FC = (props) => {
         ,
         [messengerContext.darkMode])
 
-
-    scheme.configureEdgeSidebar(builder => {
-        builder.hide("right_sidebar", !messengerContext.mountInfoListDrawer)
-        builder.hide("left_sidebar", !messengerContext.mountConversationListDrawer)
-    })
-
     return (
-        <Fullscreen>
-            <Head>
-                <title>Messenger</title>
-            </Head>
+        <SafeAreaView>
+            <Fullscreen>
+                <Head>
+                    <title>Messenger</title>
+                </Head>
 
-            <Root
-                scheme={scheme}
-                theme={customTheme}
-            >
-                <CssBaseline/>
-                {props.children}
-            </Root>
-        </Fullscreen>
+                <Root
+                    scheme={scheme}
+                    theme={customTheme}
+                >
+                    <CssBaseline/>
+                    {props.children}
+                </Root>
+            </Fullscreen>
+        </SafeAreaView>
     );
 };
 

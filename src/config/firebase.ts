@@ -3,7 +3,7 @@ import "firebase/auth"
 import "firebase/firestore"
 
 
-const fbConfig = {
+export const fbConfig = {
     apiKey: "AIzaSyC3Gp6gY_yOqH02TpAjbitK4JXgV5Raw-4",
     authDomain: "myapps-fde31.firebaseapp.com",
     databaseURL: "https://myapps-fde31.firebaseio.com",
@@ -17,3 +17,9 @@ export default !firebase.apps.length ? firebase.initializeApp(fbConfig) : fireba
 
 firebase.auth()
 firebase.firestore()
+
+export const COLLECTIONS = {
+    conversations: "conversations",
+    participants: "participants",
+    messages: "messages",
+}

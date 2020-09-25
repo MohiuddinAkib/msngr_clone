@@ -57,39 +57,36 @@ const ListDrawerComponent: React.FC = (props) => {
                 paper: classes.drawerPaperRoot
             }}
         >
-            {messengerContext.mountConversationListDrawer && <>
-                <ListDrawerHeaderComponent
-                    trigger={trigger}
-                />
-                <Scrollbars
-                    universal
-                    style={{
-                        height: "100vh",
-                    }}
-                >
-                    {view === 0 && <ConversationListComponent/>}
-                    {view === 1 && <PeopleListComponent/>}
-                </Scrollbars>
+            <ListDrawerHeaderComponent
+                trigger={trigger}
+            />
+            <Scrollbars
+                universal
+                style={{
+                    height: "100vh",
+                }}
+            >
+                {view === 0 && <ConversationListComponent/>}
+                {view === 1 && <PeopleListComponent/>}
+            </Scrollbars>
 
-                <Hidden
-                    lgUp
+            <Hidden
+                lgUp
+            >
+                <BottomNavigation
+                    value={view}
+                    onChange={handleViewNavigation}
                 >
-                    <BottomNavigation
-                        value={view}
-                        onChange={handleViewNavigation}
-                    >
-                        <BottomNavigationAction
-                            label="Chats"
-                            icon={<ChatIcon/>}
-                        />
-                        <BottomNavigationAction
-                            label="People"
-                            icon={<PeopleIcon/>}
-                        />
-                    </BottomNavigation>
-                </Hidden>
-            </>}
-
+                    <BottomNavigationAction
+                        label="Chats"
+                        icon={<ChatIcon/>}
+                    />
+                    <BottomNavigationAction
+                        label="People"
+                        icon={<PeopleIcon/>}
+                    />
+                </BottomNavigation>
+            </Hidden>
         </DrawerSidebar>
     );
 };

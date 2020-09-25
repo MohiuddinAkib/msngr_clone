@@ -7,7 +7,6 @@ import {getHeader} from "@mui-treasury/layout";
 import Toolbar from "@material-ui/core/Toolbar";
 import IconButton from "@material-ui/core/IconButton";
 import {getSidebarTrigger} from "@mui-treasury/layout";
-import {MessengerContext} from "@src/context/messenger";
 import ArrowBackIcon from '@material-ui/icons/ArrowBack';
 import {createStyles, makeStyles} from "@material-ui/core/styles";
 import ActionBtnsComponent from "@components/messenger/header/main/ActionBtns";
@@ -30,13 +29,18 @@ const useStyles = makeStyles((theme) => createStyles({
             width: "calc(100% - 300px) !important",
         }
     },
+    infoListTriggerAvatar: {
+        marginLeft: 0
+    },
+    conversationListTrigger: {
+        marginRight: 0
+    }
 }))
 
 const HeaderComponent: React.FC = (props) => {
     const classes = useStyles();
-    const messengerContext = React.useContext(MessengerContext)
 
-    return messengerContext.mountMainHeader && (
+    return (
         <Header
             elevation={1}
             className={classes.appBar}
@@ -51,12 +55,25 @@ const HeaderComponent: React.FC = (props) => {
                         <Hidden
                             lgUp
                         >
-                            <IconButton
-                                onClick={messengerContext.handleMessageComponentsVisibility}
+                            {/*<IconButton*/}
+                            {/*    onClick={messengerContext.handleMessageComponentsVisibility}*/}
+                            {/*>*/}
+                            {/*    <ArrowBackIcon/>*/}
+                            {/*</IconButton>*/}
+                            <SidebarTrigger
+                                color={"primary"}
+                                sidebarId="left_sidebar"
+                                className={classes.conversationListTrigger}
                             >
-                                <ArrowBackIcon/>
-                            </IconButton>
-                            <SidebarTrigger sidebarId={"right_sidebar"} color={"primary"}>
+                                {({open, anchor}) => {
+                                    return <ArrowBackIcon/>
+                                }}
+                            </SidebarTrigger>
+                            <SidebarTrigger
+                                color={"primary"}
+                                sidebarId={"right_sidebar"}
+                                className={classes.infoListTriggerAvatar}
+                            >
                                 {({open, anchor}) => {
                                     return <Avatar
                                         alt={"john doe"}

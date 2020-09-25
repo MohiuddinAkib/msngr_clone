@@ -70,7 +70,6 @@ const Transition = React.forwardRef(function Transition(
 
 const ListDrawerHeaderComponent: React.FC<Props> = (props) => {
     const theme = useTheme()
-    const router = useRouter()
     const classes = useStyles()
     const firebase = useFirebase()
     const handleError = useErrorHandler()
@@ -90,7 +89,6 @@ const ListDrawerHeaderComponent: React.FC<Props> = (props) => {
     const handleLogout = async () => {
         try {
             await firebase.logout()
-            router.replace("/login")
         } catch (error) {
             handleError(error)
         }

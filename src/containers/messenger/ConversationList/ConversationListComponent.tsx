@@ -1,17 +1,18 @@
 import React from "react";
 import {useSelector} from "react-redux";
 import List from "@material-ui/core/List";
+import {COLLECTIONS} from "@config/firebase";
+import {isLoaded} from "react-redux-firebase";
+import {Conversation} from "@store/rootReducer";
 import {RootState} from "@store/configureStore";
+import Skeleton from "@material-ui/lab/Skeleton";
 import SearchIcon from "@material-ui/icons/Search";
 import TextField from "@material-ui/core/TextField";
-import {useErrorHandler} from "react-error-boundary";
 import IconButton from "@material-ui/core/IconButton";
 import ListSubheader from "@material-ui/core/ListSubheader";
 import InputAdornment from "@material-ui/core/InputAdornment";
 import {createStyles, makeStyles} from "@material-ui/core/styles";
 import ListItemComponent from "@components/messenger/convesation/ListItem";
-import {FirebaseReducer, useFirestore, useFirestoreConnect} from "react-redux-firebase";
-import {Participant} from "@store/rootReducer";
 
 const useStyles = makeStyles(theme => createStyles({
     textFieldRoot: {
@@ -27,68 +28,48 @@ const useStyles = makeStyles(theme => createStyles({
 
 const ConversationListComponent: React.FC = () => {
     const classes = useStyles()
-    const firestore = useFirestore()
-    const auth = useSelector<RootState, FirebaseReducer.AuthState>(state => state.firebase.auth)
+    const conversations = useSelector<RootState, { [key: string]: Conversation }>(state => state.firestore.data[COLLECTIONS.conversations])
 
-    useFirestoreConnect([
-        {
-            collection: "participants",
-            where: ["users_id", "==", firestore.doc(`users/${auth.uid}`)]
-        }
-    ])
+    const items = isLoaded(conversations) && Object
+        .entries(conversations)
+        .map(([key, conversation]) => (
+            <ListItemComponent
+                key={key}
+                conversationId={key}
+                conversation={conversation}
+            />
+        ))
 
     return (
-        <List subheader={
-            <ListSubheader disableSticky disableGutters>
-                <TextField
-                    fullWidth
-                    margin={"dense"}
-                    variant={"outlined"}
-                    classes={{root: classes.textFieldRoot}}
-                    InputProps={{
-                        classes: {root: classes.inputRoot, input: classes.textFieldNativeInput},
-                        startAdornment: (
-                            <InputAdornment position={"start"}>
-                                <IconButton>
-                                    <SearchIcon/>
-                                </IconButton>
-                            </InputAdornment>
-                        ),
+        <List
+            subheader={
+                <ListSubheader
+                    disableSticky
+                    disableGutters>
+                    <TextField
+                        fullWidth
+                        margin={"dense"}
+                        variant={"outlined"}
+                        classes={{root: classes.textFieldRoot}}
+                        InputProps={{
+                            classes: {root: classes.inputRoot, input: classes.textFieldNativeInput},
+                            startAdornment: (
+                                <InputAdornment
+                                    position={"start"}
+                                >
+                                    <IconButton>
+                                        <SearchIcon/>
+                                    </IconButton>
+                                </InputAdornment>
+                            ),
 
-                    }}
-                    placeholder={"Search in Index"}
-                />
-            </ListSubheader>
-        }>
-            <ListItemComponent/>
-            <ListItemComponent/>
-            <ListItemComponent/>
-            <ListItemComponent/>
-            <ListItemComponent/>
-            <ListItemComponent/>
-            <ListItemComponent/>
-            <ListItemComponent/>
-            <ListItemComponent/>
-            <ListItemComponent/>
-            <ListItemComponent/>
-            <ListItemComponent/>
-            <ListItemComponent/>
-            <ListItemComponent/>
-            <ListItemComponent/>
-            <ListItemComponent/>
-            <ListItemComponent/>
-            <ListItemComponent/>
-            <ListItemComponent/>
-            <ListItemComponent/>
-            <ListItemComponent/>
-            <ListItemComponent/>
-            <ListItemComponent/>
-            <ListItemComponent/>
-            <ListItemComponent/>
-            <ListItemComponent/>
-            <ListItemComponent/>
-            <ListItemComponent/>
-            <ListItemComponent/>
+                        }}
+                        placeholder={"Search in Index"}
+                    />
+
+                </ListSubheader>
+            }>
+            {items}
         </List>
     );
 };
