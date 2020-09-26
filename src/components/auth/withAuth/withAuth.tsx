@@ -1,10 +1,6 @@
 import React from "react";
 import {NextPage} from "next";
 import Cookies from "universal-cookie"
-import {useSelector} from "react-redux";
-import Router, {useRouter,} from "next/router";
-import {RootState} from "@store/configureStore";
-import {FirebaseReducer, isLoaded, isEmpty} from "react-redux-firebase";
 
 
 const withAuth = (WrappedComponent: NextPage): NextPage => {
