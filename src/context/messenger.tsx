@@ -1,5 +1,6 @@
 import React from "react"
 import {useRouter} from "next/router";
+import Cookies from "universal-cookie";
 import {useSelector} from "react-redux";
 import {COLLECTIONS} from "@config/firebase";
 import {RootState} from "@store/configureStore";
@@ -10,7 +11,7 @@ import {
     FirebaseReducer,
     isEmpty,
     isLoaded,
-    ReduxFirestoreQuerySetting,
+    ReduxFirestoreQuerySetting, useFirebase,
     useFirestoreConnect
 } from "react-redux-firebase";
 
@@ -19,6 +20,7 @@ export const MessengerContext = React.createContext<any>({})
 const MessengerProvider: React.FC = (props) => {
     const theme = useTheme()
     const router = useRouter()
+    const firebase = useFirebase()
     const pc = useMediaQuery(theme.breakpoints.up("md"))
     const [darkMode, setDarkMode] = React.useState(false)
     const auth = useSelector<RootState, FirebaseReducer.AuthState>(state => state.firebase.auth)
@@ -65,6 +67,19 @@ const MessengerProvider: React.FC = (props) => {
             setQueries(prevQueries => prevQueries.concat(messageQueriesToAppend, participantQueriesToAppend))
         }
     }, [conversations])
+
+    React.useEffect(() => {
+        const cookies = new Cookies();
+        return firebase.auth().onIdTokenChanged(async user => {
+            if (!user) {
+                cookies.set("auth", "")
+                return;
+            }
+
+            const token = await user.getIdToken()
+            cookies.set("auth", token)
+        })
+    }, [])
 
 
     return (
