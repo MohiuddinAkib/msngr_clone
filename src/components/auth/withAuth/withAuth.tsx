@@ -1,28 +1,41 @@
 import React from "react";
 import {NextPage} from "next";
-import {useRouter} from "next/router";
+import Cookies from "universal-cookie"
 import {useSelector} from "react-redux";
+import Router, {useRouter,} from "next/router";
 import {RootState} from "@store/configureStore";
 import {FirebaseReducer, isLoaded, isEmpty} from "react-redux-firebase";
 
-const withAuth = <T extends object>(WrappedComponent: NextPage): React.FC<T> => {
-    return (props) => {
-        const auth = useSelector<RootState, FirebaseReducer.AuthState>(state => state.firebase.auth)
-        const router = useRouter()
 
-        React.useEffect(() => {
-            if (isLoaded(auth) && isEmpty(auth)) {
-                router.replace({
-                    pathname: "/login",
-                    query: {
-                        next: router.pathname
-                    }
-                })
-            }
-        }, [auth])
+const withAuth = (WrappedComponent: NextPage): NextPage => {
+    return class AuthComponent extends React.Component {
+        static async getInitialProps(ctx) {
+            const cookeis = new Cookies(ctx.req && ctx.req.headers.cookie)
+            const idToken = cookeis.get("auth")
 
-        return <WrappedComponent/>
-    }
+            //TODO: complete the authentication SSR
+
+            // if (!idToken) {
+            //     if (ctx.res) {
+            //         // server
+            //         // 303: "See other"
+            //         ctx.res.writeHead(303, {Location: "/login"});
+            //         ctx.res.end();
+            //     } else {
+            //         // In the browser, we just pretend like this never even happened ;)
+            //         Router.replace("/login");
+            //     }
+            //     return {};
+            // }
+            //
+            return {};
+        }
+
+        render() {
+            return <WrappedComponent {...this.props} />;
+        }
+    };
 }
+
 
 export default withAuth;
