@@ -4,7 +4,6 @@ import Box from "@material-ui/core/Box";
 import {useSelector} from "react-redux";
 import Fade from "@material-ui/core/Fade"
 import {COLLECTIONS} from "@config/firebase";
-import {BaseEmoji, Picker} from "emoji-mart"
 import GifIcon from "@material-ui/icons/Gif";
 import IGif from "@giphy/js-types/dist/gif";
 import Drawer from "@material-ui/core/Drawer";
@@ -12,9 +11,12 @@ import Popper from "@material-ui/core/Popper";
 import Hidden from "@material-ui/core/Hidden";
 import SendIcon from "@material-ui/icons/Send";
 import {RootState} from "@store/configureStore";
+import Skeleton from "@material-ui/lab/Skeleton";
 import TextField from "@material-ui/core/TextField";
 import {useErrorHandler} from "react-error-boundary";
 import IconButton from "@material-ui/core/IconButton";
+import Typography from "@material-ui/core/Typography";
+import {BaseEmoji, Picker, emojiIndex} from "emoji-mart"
 import useMediaQuery from "@material-ui/core/useMediaQuery";
 import {SearchContextManager} from "@giphy/react-components";
 import InputAdornment from "@material-ui/core/InputAdornment";
@@ -25,6 +27,7 @@ import {FirebaseReducer, isLoaded, useFirestore} from "react-redux-firebase";
 import {createStyles, makeStyles, useTheme} from "@material-ui/core/styles";
 import BottomNavigationAction from "@material-ui/core/BottomNavigationAction";
 import SentimentSatisfiedAltIcon from "@material-ui/icons/SentimentSatisfied";
+import ReactTextareaAutocomplete from "@webscopeio/react-textarea-autocomplete";
 import {usePopupState, bindTrigger, bindPopper} from "material-ui-popup-state/hooks"
 
 const useStyles = makeStyles(theme => createStyles({
@@ -37,6 +40,36 @@ const useStyles = makeStyles(theme => createStyles({
 }))
 
 type BottomNavValType = "emoji" | "gif"
+
+const Input: any = React.forwardRef((props: any, ref) => {
+    const classes = useStyles()
+    const {onChange, onBlur, onClick, onKeyDown, onScroll, onSelect, onKeyPress} = props;
+    return (
+        <TextField
+            fullWidth
+            multiline
+            size={"small"}
+            inputRef={ref}
+            margin={"dense"}
+            value={props.value}
+            InputProps={{
+                onClick,
+                onKeyDown,
+                onScroll,
+                onChange,
+                onSelect,
+                onKeyPress,
+                classes: {
+                    notchedOutline: classes.messageTextField
+                },
+                endAdornment: props.endAdornment,
+            }}
+            rowsMax={5}
+            variant={"outlined"}
+            placeholder={"Type a message..."}
+        />
+    )
+})
 
 const MessageFieldComponent: React.FC = (props) => {
     const theme = useTheme()
@@ -53,7 +86,7 @@ const MessageFieldComponent: React.FC = (props) => {
     })
     const auth = useSelector<RootState, FirebaseReducer.AuthState>(state => state.firebase.auth)
 
-    const handleTextChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const handleTextChange = (event: React.ChangeEvent<HTMLTextAreaElement>) => {
         setText(event.target.value)
     }
 
@@ -127,32 +160,39 @@ const MessageFieldComponent: React.FC = (props) => {
         <Box
             display={"flex"}
         >
-            <TextField
-                fullWidth
-                multiline
+            <ReactTextareaAutocomplete<any>
                 value={text}
-                size={"small"}
-                margin={"dense"}
-                InputProps={{
-                    classes: {
-                        notchedOutline: classes.messageTextField
-                    },
-                    endAdornment: (
-                        <InputAdornment position={"end"}>
-                            <IconButton
-                                color={"primary"}
-                                {...bindTrigger(popupState)}
-                            >
-                                <SentimentSatisfiedAltIcon fontSize={"large"}/>
-                            </IconButton>
-                        </InputAdornment>
-                    )
-                }}
-                rowsMax={5}
-                variant={"outlined"}
+                textAreaComponent={Input}
                 onChange={handleTextChange}
                 onKeyPress={handleOnKeyPress}
-                placeholder={"Type a message..."}
+                loadingComponent={() => <Skeleton variant="rect" width={210} height={118}/>}
+                endAdornment={
+                    <InputAdornment
+                        position={"end"}
+                    >
+                        <IconButton
+                            color={"primary"}
+                            {...bindTrigger(popupState)}
+                        >
+                            <SentimentSatisfiedAltIcon
+                                fontSize={"large"}
+                            />
+                        </IconButton>
+                    </InputAdornment>
+                }
+                trigger={{
+                    ":": {
+                        dataProvider: token =>
+                            (emojiIndex as any).search(token).map((o: BaseEmoji) => ({
+                                colons: o.colons,
+                                native: o.native,
+                            })),
+                        component: ({entity: {native, colons}}) => (
+                            <Typography paragraph>{`${colons} ${native}`}</Typography>
+                        ),
+                        output: (item) => `${item.native}`,
+                    },
+                }}
             />
 
             <IconButton

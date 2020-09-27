@@ -2943,6 +2943,14 @@
     "@webassemblyjs/wast-parser" "1.9.0"
     "@xtuc/long" "4.2.2"
 
+"@webscopeio/react-textarea-autocomplete@^4.7.2":
+  version "4.7.2"
+  resolved "https://registry.yarnpkg.com/@webscopeio/react-textarea-autocomplete/-/react-textarea-autocomplete-4.7.2.tgz#e8cf8349ec285739a58b965a9c3cd7b3b71a5f34"
+  integrity sha512-ehSH7oplghxTsbsjOnjAk/JT7bLjl7dRvnFgu36coYrqP0F3Ir/0ErA6ub26JunjOAyeQduj4xtnDGSiD9u0/w==
+  dependencies:
+    custom-event "^1.0.1"
+    textarea-caret "3.0.2"
+
 "@xobotyi/scrollbar-width@1.9.5":
   version "1.9.5"
   resolved "https://registry.yarnpkg.com/@xobotyi/scrollbar-width/-/scrollbar-width-1.9.5.tgz#80224a6919272f405b87913ca13b92929bdf3c4d"
@@ -4670,6 +4678,11 @@ csstype@^3.0.2:
   version "3.0.3"
   resolved "https://registry.yarnpkg.com/csstype/-/csstype-3.0.3.tgz#2b410bbeba38ba9633353aff34b05d9755d065f8"
   integrity sha512-jPl+wbWPOWJ7SXsWyqGRk3lGecbar0Cb0OvZF/r/ZU011R4YqiRehgkQ9p4eQfo9DSDLqLL3wHwfxeJiuIsNag==
+
+custom-event@^1.0.1:
+  version "1.0.1"
+  resolved "https://registry.yarnpkg.com/custom-event/-/custom-event-1.0.1.tgz#5d02a46850adf1b4a317946a3928fccb5bfd0425"
+  integrity sha1-XQKkaFCt8bSjF5RqOSj8y1v9BCU=
 
 cyclist@^1.0.1:
   version "1.0.1"
@@ -10504,6 +10517,11 @@ text-table@0.2.0, text-table@^0.2.0:
   version "0.2.0"
   resolved "https://registry.yarnpkg.com/text-table/-/text-table-0.2.0.tgz#7f5ee823ae805207c00af2df4a84ec3fcfa570b4"
   integrity sha1-f17oI66AUgfACvLfSoTsP8+lcLQ=
+
+textarea-caret@3.0.2:
+  version "3.0.2"
+  resolved "https://registry.yarnpkg.com/textarea-caret/-/textarea-caret-3.0.2.tgz#f360c48699aa1abf718680a43a31a850665c2caf"
+  integrity sha1-82DEhpmqGr9xhoCkOjGoUGZcLK8=
 
 throttle-debounce@^2.1.0, throttle-debounce@^2.3.0:
   version "2.3.0"

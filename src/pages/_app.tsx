@@ -10,6 +10,7 @@ import {StylesProvider} from "@material-ui/styles";
 import CssBaseline from "@material-ui/core/CssBaseline";
 import {createFirestoreInstance} from "redux-firestore"
 import {RootState, wrapper} from "@store/configureStore";
+import "@webscopeio/react-textarea-autocomplete/style.css";
 import {ReactReduxFirebaseProvider} from "react-redux-firebase"
 import {ErrorBoundary, FallbackProps} from "react-error-boundary"
 import AuthIsLoadedComponent from "@components/auth/AuthIsLoaded";

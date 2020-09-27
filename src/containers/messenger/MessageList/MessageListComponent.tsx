@@ -1,8 +1,8 @@
 import clsx from "clsx"
 import React from "react";
-import emojiRegex from "emoji-regex";
 import {useRouter} from "next/router";
 import {useSelector} from "react-redux";
+import ntvEmojiRegex from "emoji-regex";
 import List from "@material-ui/core/List";
 import Grid from "@material-ui/core/Grid";
 import Card from "@material-ui/core/Card";
@@ -194,15 +194,15 @@ const MessageListComponent: React.FC = (props) => {
                             >
                                 {item.messages.map(eachMessageItem => {
                                         if (eachMessageItem.type === "text") {
-                                            const regex = emojiRegex();
+                                            const ntvRegex = ntvEmojiRegex();
                                             const emojis = [];
                                             let match;
-                                            while (match = regex.exec(eachMessageItem.message as string)) {
+                                            while (match = ntvRegex.exec(eachMessageItem.message as string)) {
                                                 const [emoji] = match;
                                                 emojis.push(emoji)
                                             }
 
-                                            const regex2 = new RegExp(`(${emojis.join("|")})`)
+                                            const regex2 = emojis.join("|")
 
                                             const res = !emojis.length
                                                 ?
