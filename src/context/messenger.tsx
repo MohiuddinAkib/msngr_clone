@@ -81,7 +81,6 @@ const MessengerProvider: React.FC = (props) => {
         })
     }, [])
 
-
     return (
         <MessengerContext.Provider
             value={{

@@ -1,4 +1,5 @@
 import {firestore} from "firebase";
+import IGif from "@giphy/js-types/dist/gif";
 import {combineReducers} from "@reduxjs/toolkit"
 import {firestoreReducer} from "redux-firestore";
 import {conversationSlice} from "@store/features/conversations";
@@ -29,8 +30,8 @@ export interface Conversation {
 }
 
 export interface UserMessage {
-    type: string;
-    message: string;
+    type: "text" | "gif" | "file";
+    message: string | IGif;
     sender_id: string;
     created_at: string;
 }

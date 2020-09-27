@@ -82,8 +82,23 @@ const MessageFieldComponent: React.FC = (props) => {
         setText(prevText => prevText.concat(emoji.native))
     }
 
-    const handleGifClick = (gif: IGif, e: React.SyntheticEvent<HTMLElement, Event>) => {
-        console.log(gif)
+    const handleGifClick = async (gif: IGif, e: React.SyntheticEvent<HTMLElement, Event>) => {
+        try {
+            const conversationDocId = router.query.conversation_uid as string
+            await firestore
+                .collection(COLLECTIONS.conversations)
+                .doc(conversationDocId)
+                .collection(COLLECTIONS.messages)
+                .add({
+                    type: "gif",
+                    message: gif,
+                    deleted_at: null,
+                    sender_id: auth.uid,
+                    created_at: new Date().toISOString(),
+                })
+        } catch (error) {
+            handleError(error)
+        }
     }
 
     const handleSendMsg = async () => {
@@ -99,7 +114,7 @@ const MessageFieldComponent: React.FC = (props) => {
                         message: text,
                         deleted_at: null,
                         sender_id: auth.uid,
-                        created_at: new Date(Date.now()),
+                        created_at: new Date().toISOString(),
                     })
                 setText("")
             } catch (error) {
