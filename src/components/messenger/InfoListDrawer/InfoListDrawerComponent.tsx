@@ -95,6 +95,7 @@ const InfoListDrawerComponent: React.FC = (props) => {
                         title={"John doe"}
                         subheader={"Active 15min ago"}
                     />
+                    {/*TODO: presence implementation*/}
                 </CardContent>
                 <List>
                     <Divider component={"li"}/>

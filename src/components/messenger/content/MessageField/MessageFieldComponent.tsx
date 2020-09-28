@@ -54,6 +54,7 @@ const Input: any = React.forwardRef((props: any, ref) => {
             value={props.value}
             InputProps={{
                 onClick,
+                onBlur,
                 onKeyDown,
                 onScroll,
                 onChange,

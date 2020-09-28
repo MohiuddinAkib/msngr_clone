@@ -136,7 +136,6 @@ const MessageListComponent: React.FC = (props) => {
 
     React.useEffect(() => {
         if (conversationMessages && isLoaded(conversationMessages) && !isEmpty(conversationMessages)) {
-
             const formattedMessages: { key: string; messages: UserMessage[] }[] = [];
             let matched = 0;
             let counter = 0;
