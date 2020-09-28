@@ -34,6 +34,14 @@ export interface UserMessage {
     message: string | IGif;
     sender_id: string;
     created_at: string;
+    name?: string;
+    size?: number;
+    fullPath?: string;
+    downloadURL?: string;
+    contentType?: "image/jpeg" | "video/webm;codecs=vp8";
+    customMetadata?: Object;
+    deleted_at: string | null;
+    updated_at?: string
 }
 
 interface Schema {

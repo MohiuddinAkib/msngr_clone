@@ -41,7 +41,8 @@
     "redux": "^4.0.5",
     "redux-firestore": "^0.13.0",
     "styled-components": "^5.1.1",
-    "universal-cookie": "^4.0.4"
+    "universal-cookie": "^4.0.4",
+    "use-sound": "^1.0.2"
   },
   "devDependencies": {
     "@expo/next-adapter": "^2.1.29",

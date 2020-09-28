@@ -117,6 +117,13 @@ const useStyles = makeStyles(theme => createStyles({
     myMsgActionOptionsContainer: {
         marginLeft: 0,
         marginRight: theme.spacing(2),
+    },
+    fileContainer: {
+        marginBottom: theme.spacing(2),
+    },
+    file: {
+        maxWidth: "50vw",
+        borderRadius: theme.shape.borderRadius * 2,
     }
 }))
 
@@ -132,7 +139,6 @@ const MessageListComponent: React.FC = (props) => {
     const auth = useSelector<RootState, FirebaseReducer.AuthState>(state => state.firebase.auth)
     const [messages, setMessages] = React.useState<{ key: string; messages: UserMessage[] }[]>([])
     const conversationMessages = useSelector<RootState, { [key: string]: UserMessage }>(state => state.firestore.data[`messages-${router.query.conversation_uid}`])
-
 
     React.useEffect(() => {
         if (conversationMessages && isLoaded(conversationMessages) && !isEmpty(conversationMessages)) {
@@ -375,6 +381,83 @@ const MessageListComponent: React.FC = (props) => {
                                                             </Card>
                                                         </View>
                                                     </TouchableWithoutFeedback>
+                                                </div>
+                                            )
+                                        }
+
+                                        if (eachMessageItem.type === "file") {
+                                            return (
+                                                <div
+                                                    key={eachMessageItem.created_at}
+                                                    className={clsx(classes.gifWrapper, {
+                                                        [classes.myGifWrapper]: eachMessageItem.sender_id === auth.uid
+                                                    })}
+                                                >
+                                                    <Grid
+                                                        item
+                                                        container
+                                                        className={clsx(classes.msgActionOptionsContainer, {
+                                                            [classes.myMsgActionOptionsContainer]: eachMessageItem.sender_id === auth.uid
+                                                        })}
+                                                        direction={eachMessageItem.sender_id === auth.uid ? "row" : "row-reverse"}
+                                                    >
+                                                        <Grid
+                                                            item
+                                                        >
+                                                            <IconButton
+                                                                size={"small"}
+                                                            >
+                                                                <MoreHorizIcon
+                                                                    fontSize={"small"}
+                                                                />
+                                                            </IconButton>
+                                                        </Grid>
+
+                                                        <Grid
+                                                            item
+                                                        >
+                                                            <IconButton
+                                                                size={"small"}
+                                                            >
+                                                                <ReplyIcon
+                                                                    fontSize={"small"}
+                                                                />
+                                                            </IconButton>
+                                                        </Grid>
+
+                                                        <Grid
+                                                            item
+                                                        >
+                                                            <IconButton
+                                                                size={"small"}
+                                                                {...bindTrigger(reactionPopup)}
+                                                            >
+                                                                <SentimentVerySatisfiedIcon
+                                                                    fontSize={"small"}
+                                                                />
+                                                            </IconButton>
+                                                        </Grid>
+                                                    </Grid>
+
+                                                    <div
+                                                        className={classes.fileContainer}
+                                                    >
+                                                        {eachMessageItem.contentType === "image/jpeg" && (
+                                                            <img
+                                                                alt={eachMessageItem.name}
+                                                                className={classes.file}
+                                                                src={eachMessageItem.downloadURL}
+                                                            />
+                                                        )}
+
+                                                        {eachMessageItem.contentType === "video/webm;codecs=vp8" && (
+                                                            <video
+                                                                controls
+                                                                className={classes.file}
+                                                                src={eachMessageItem.downloadURL}
+                                                            />
+                                                        )}
+                                                    </div>
                                                 </div>
                                             )
                                         }

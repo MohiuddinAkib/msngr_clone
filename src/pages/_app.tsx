@@ -61,7 +61,7 @@ const MyApp: React.FC<AppProps> = (props) => {
                                 presence: "presence",
                                 sessions: "sessions",
                                 useFirestoreForProfile: true,
-                                useFirestoreForStorageMeta: true,
+                                useFirestoreForStorageMeta: true
                             }}
                             initializeAuth
                             firebase={firebase}
