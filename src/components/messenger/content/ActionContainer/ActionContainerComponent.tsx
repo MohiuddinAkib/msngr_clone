@@ -1,5 +1,6 @@
 import React from "react";
 import moment from "moment";
+import useSound from "use-sound";
 import Webcam from "react-webcam";
 import dynamic from "next/dynamic";
 import {useRouter} from "next/router";
@@ -105,13 +106,13 @@ const ActionContainerComponent: React.FC<Props> = (props) => {
     const mediaRecorderRef = React.useRef<MediaRecorder>(null);
     const previewVideoRef = React.useRef<HTMLVideoElement>(null);
 
+    const [playCameraShutterSound] = useSound("/camera-shutter.mp3");
     const [openCameraDialog, setOpenCameraDialog] = React.useState(false)
     const [capturingVideo, setCapturingVideo] = React.useState(false);
     const [videoChunks, setVideoChunks] = React.useState<Blob[]>([]);
     const [videoRecordPreviewBlob, setVideoRecordPreviewBlob] = React.useState("")
     const [videoSending, setVideoSending] = React.useState(false)
     const [screenshotSending, setScreenshotSending] = React.useState(false)
-
     const [ssTime, setSsTime] = React.useState(3)
     const [capturingScreenShot, setCapturingScreenshot] = React.useState(false);
     const [screenshotPreviewBlob, setScreenshotPreviewBlob] = React.useState("");
@@ -155,11 +156,11 @@ const ActionContainerComponent: React.FC<Props> = (props) => {
     }
 
     const onRecordData = (recordedBlob: Blob) => {
-        console.log('chunk of real-time data is: ', recordedBlob);
+        console.log("chunk of real-time data is: ", recordedBlob);
     }
 
     const onRecordStop = (recordedBlob: ReactMicStopEvent) => {
-        console.log('recordedBlob is: ', recordedBlob);
+        console.log("recordedBlob is: ", recordedBlob);
     }
 
     const handleOnUserMedia = () => {
@@ -177,6 +178,7 @@ const ActionContainerComponent: React.FC<Props> = (props) => {
             }
 
             if (ssTime === 0) {
+                playCameraShutterSound();
                 const imageSrc = webcamRef.current.getScreenshot();
                 setScreenshotPreviewBlob(imageSrc)
             }
@@ -644,7 +646,7 @@ const ActionContainerComponent: React.FC<Props> = (props) => {
                     )}
 
                     {!hasCameraPermission && <Typography>
-                        Please check your camera's connection and ensure your camera is not already in use by another
+                        Please check your camera"s connection and ensure your camera is not already in use by another
                         applicaiton.
                     </Typography>}
                 </DialogContent>
