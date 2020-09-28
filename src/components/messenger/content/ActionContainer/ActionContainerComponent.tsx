@@ -136,11 +136,6 @@ const ActionContainerComponent: React.FC<Props> = (props) => {
 
     const handleCameraDialogClose = () => {
         setOpenCameraDialog(false)
-        setVideoChunks([])
-        setCapturingVideo(false)
-        setScreenshotPreviewBlob("")
-        setVideoRecordPreviewBlob("")
-        setCapturingScreenshot(false)
     }
 
     const handleRecorderClickAway = () => {
@@ -207,15 +202,17 @@ const ActionContainerComponent: React.FC<Props> = (props) => {
     }, [capturingScreenShot])
 
     const handleTakeVideo = React.useCallback(() => {
-        setCapturingVideo(true);
-        mediaRecorderRef.current = new MediaRecorder(webcamRef.current.stream, {
-            mimeType: "video/webm"
-        });
-        mediaRecorderRef.current.addEventListener(
-            "dataavailable",
-            handleDataAvailable
-        );
-        mediaRecorderRef.current.start();
+        if (webcamRef.current) {
+            setCapturingVideo(true);
+            mediaRecorderRef.current = new MediaRecorder(webcamRef.current.stream, {
+                mimeType: "video/webm"
+            });
+            mediaRecorderRef.current.addEventListener(
+                "dataavailable",
+                handleDataAvailable
+            );
+            mediaRecorderRef.current.start();
+        }
     }, [webcamRef, setCapturingVideo, mediaRecorderRef]);
 
     const handleDataAvailable = React.useCallback(
@@ -239,6 +236,8 @@ const ActionContainerComponent: React.FC<Props> = (props) => {
     const handleSendVideo = React.useCallback(async () => {
         if (videoChunks.length && isLoaded(auth) && !isEmpty(auth)) {
             setVideoSending(true)
+            previewVideoRef.current.pause()
+
             try {
                 const rcrdBlob = new Blob(videoChunks, {type: "video/webm;codecs=vp8"})
 
@@ -275,7 +274,12 @@ const ActionContainerComponent: React.FC<Props> = (props) => {
             } catch (error) {
                 // handleError(error)
             } finally {
-                handleCameraDialogClose()
+                setVideoChunks([])
+                setCapturingVideo(false)
+                setScreenshotPreviewBlob("")
+                setVideoRecordPreviewBlob("")
+                setCapturingScreenshot(false)
+                // handleCameraDialogClose()
                 setVideoSending(false)
             }
         }
@@ -326,7 +330,12 @@ const ActionContainerComponent: React.FC<Props> = (props) => {
             } catch (error) {
                 // handleError(error)
             } finally {
-                handleCameraDialogClose()
+                setVideoChunks([])
+                setCapturingVideo(false)
+                setScreenshotPreviewBlob("")
+                setVideoRecordPreviewBlob("")
+                setCapturingScreenshot(false)
+                // handleCameraDialogClose()
                 setScreenshotSending(false)
             }
         }
@@ -616,6 +625,7 @@ const ActionContainerComponent: React.FC<Props> = (props) => {
                             {ssTime}
                             </Typography>
                         </span>}
+
                         <Webcam
                             audio
                             width={"100%"}
@@ -626,23 +636,55 @@ const ActionContainerComponent: React.FC<Props> = (props) => {
                             onUserMediaError={handleOnUserMediaError}
                         />
                     </div>}
+
                     {
-                        !!screenshotPreviewBlob && <img
-                            src={screenshotPreviewBlob}
-                            className={classes.screenshotPreview}
-                        />
+                        !!screenshotPreviewBlob &&
+                        <div
+                            className={classes.webcamContainer}
+                        >
+                            {screenshotSending && <span
+                                className={classes.webcamOverlay}
+                            >
+                                    <Typography
+                                        variant={"h1"}
+                                        className={classes.ssTimeTxt}
+                                    >
+                                        <CircularProgress/>
+                                    </Typography>
+                                </span>}
+                            <img
+                                src={screenshotPreviewBlob}
+                                className={classes.screenshotPreview}
+                            />
+                        </div>
+
                     }
 
                     {(!capturingVideo && videoChunks.length > 0) && (
-                        <video
-                            loop
-                            autoPlay
-                            width={"100%"}
-                            height={"100%"}
-                            ref={previewVideoRef}
-                            className={classes.webcam}
-                            src={videoRecordPreviewBlob}
-                        />
+                        <div
+                            className={classes.webcamContainer}
+                        >
+                            {videoSending && <span
+                                className={classes.webcamOverlay}
+                            >
+                                <Typography
+                                    variant={"h1"}
+                                    className={classes.ssTimeTxt}
+                                >
+                                    <CircularProgress/>
+                                </Typography>
+                            </span>}
+
+                            <video
+                                loop
+                                autoPlay
+                                width={"100%"}
+                                height={"100%"}
+                                ref={previewVideoRef}
+                                className={classes.webcam}
+                                src={videoRecordPreviewBlob}
+                            />
+                        </div>
                     )}
 
                     {!hasCameraPermission && <Typography>
