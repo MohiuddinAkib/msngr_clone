@@ -66,7 +66,9 @@ const ListItemComponent: React.FC<Props> = (props) => {
 
 
     const showMessages = () => {
-        router.push(`/messages/${props.conversationId}`)
+        if (router.query.conversation_uid !== props.conversationId) {
+            router.push(`/messages/${props.conversationId}`)
+        }
     }
 
     React.useEffect(() => {
