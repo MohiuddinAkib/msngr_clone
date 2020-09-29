@@ -1,6 +1,7 @@
 import React from "react";
 import propTypes from "prop-types"
 import {useRouter} from "next/router";
+import Cookies from "universal-cookie"
 import {useSelector} from "react-redux";
 import Grid from "@material-ui/core/Grid";
 import List from "@material-ui/core/List";
@@ -70,6 +71,7 @@ const Transition = React.forwardRef(function Transition(
 
 const ListDrawerHeaderComponent: React.FC<Props> = (props) => {
     const theme = useTheme()
+    const router = useRouter()
     const classes = useStyles()
     const firebase = useFirebase()
     const handleError = useErrorHandler()
@@ -87,8 +89,11 @@ const ListDrawerHeaderComponent: React.FC<Props> = (props) => {
     }
 
     const handleLogout = async () => {
+        const cookies = new Cookies()
         try {
             await firebase.logout()
+            cookies.remove("auth")
+            router.replace("/login")
         } catch (error) {
             handleError(error)
         }

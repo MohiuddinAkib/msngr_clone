@@ -16,6 +16,7 @@
     "@mui-treasury/layout": "^4.5.0",
     "@reduxjs/toolkit": "^1.4.0",
     "@webscopeio/react-textarea-autocomplete": "^4.7.2",
+    "cors": "^2.8.5",
     "emoji-mart": "^3.0.0",
     "emoji-regex": "^9.0.0",
     "firebase": "^7.19.1",

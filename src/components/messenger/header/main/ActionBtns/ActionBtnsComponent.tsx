@@ -10,16 +10,27 @@ const SidebarTrigger = getSidebarTrigger(styled)
 
 
 const ActionBtnsComponent = () => {
+
+    const handleAudioCall = () => {
+        window.open("http://127.0.0.1:3000/messages", "Messenger Clone", "modal=yes;alwaysRaised=yes")
+    }
+
+    const handleVideoCall = () => {
+        window.open("http://127.0.0.1:3000/messages", "Messenger Clone", "modal=yes;alwaysRaised=yes")
+    }
+
     return (
         <>
             <IconButton
                 color={"primary"}
+                onClick={handleAudioCall}
             >
                 <PhoneIcon/>
             </IconButton>
 
             <IconButton
                 color={"primary"}
+                onClick={handleVideoCall}
             >
                 <VideoCallIcon/>
             </IconButton>

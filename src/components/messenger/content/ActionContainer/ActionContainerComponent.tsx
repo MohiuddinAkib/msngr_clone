@@ -135,6 +135,11 @@ const ActionContainerComponent: React.FC<Props> = (props) => {
     }
 
     const handleCameraDialogClose = () => {
+        if (capturingVideo) {
+            // dialog close krar poreo jno video cholte na thake..noile next dialog open
+            // ager media recorder reference webcam er ref harai fele r error throw kore
+            handleStopVideo()
+        }
         setOpenCameraDialog(false)
     }
 
@@ -151,11 +156,56 @@ const ActionContainerComponent: React.FC<Props> = (props) => {
     }
 
     const onRecordData = (recordedBlob: Blob) => {
-        console.log("chunk of real-time data is: ", recordedBlob);
     }
 
-    const onRecordStop = (recordedBlob: ReactMicStopEvent) => {
-        console.log("recordedBlob is: ", recordedBlob);
+    const onRecordStop = async (recordedBlob: ReactMicStopEvent) => {
+        if (isLoaded(auth) && !isEmpty(auth)) {
+            // setVideoSending(true)
+            // previewVideoRef.current.pause()
+            try {
+                await firebase.uploadFile(
+                    "message-audios",
+                    recordedBlob.blob,
+                    `conversations/${router.query.conversation_uid}/messages`,
+                    {
+                        metadataFactory: (uploadRes, firebase, meta, downloadURL) => {
+                            const {metadata: {fullPath, timeCreated, updated, contentType, customMetadata, size, name}} = uploadRes
+                            return {
+                                name,
+                                size,
+                                fullPath,
+                                downloadURL,
+                                type: "file",
+                                contentType,
+                                customMetadata,
+                                deleted_at: null,
+                                updated_at: updated,
+                                sender_id: auth.uid,
+                                created_at: timeCreated,
+                            }
+                        },
+                        metadata: {
+                            customMetadata: {
+                                sender_id: auth.uid,
+                            },
+                            contentType: recordedBlob.options.mimeType,
+                        },
+                        name: `${auth.uid}-${moment().toISOString()}`,
+                    })
+            } catch (error) {
+                // handleError(error)
+            } finally {
+                // setVideoChunks([])
+                // setCapturingVideo(false)
+                // setScreenshotPreviewBlob("")
+                // setVideoRecordPreviewBlob("")
+                // setCapturingScreenshot(false)
+                // handleCameraDialogClose()
+                // setVideoSending(false)
+            }
+        }
+
+        handleRecorderClickAway()
     }
 
     const handleOnUserMedia = () => {
@@ -172,13 +222,15 @@ const ActionContainerComponent: React.FC<Props> = (props) => {
 
             }
 
-            if (ssTime === 0) {
+            if (ssTime === 0 && openCameraDialog) {
+                // pic tular countdown start howar pore dialog close krle jno r pic na tule
+                // noile webcamref current ta null howai getScreenshot error marbe
                 playCameraShutterSound();
                 const imageSrc = webcamRef.current.getScreenshot();
                 setScreenshotPreviewBlob(imageSrc)
             }
         },
-        [webcamRef, ssTime]
+        [webcamRef, ssTime, openCameraDialog]
     );
 
     React.useEffect(() => {
@@ -194,12 +246,18 @@ const ActionContainerComponent: React.FC<Props> = (props) => {
             }, 1500)
         }
 
+        // Countdown cholakalin jdi dialog close kre dei timer ty off kre dibo
+        if (!openCameraDialog && timer) {
+            clearInterval(timer)
+            setCapturingScreenshot(false)
+        }
+
         return () => {
             if (timer) {
                 clearInterval(timer)
             }
         }
-    }, [capturingScreenShot])
+    }, [capturingScreenShot, openCameraDialog])
 
     const handleTakeVideo = React.useCallback(() => {
         if (webcamRef.current) {
@@ -550,25 +608,41 @@ const ActionContainerComponent: React.FC<Props> = (props) => {
                                     onClickAway={handleRecorderClickAway}
                                 >
                                     <CardContent>
-                                        <ReactMic
-                                            record={record}
-                                            strokeColor="#000000"
-                                            backgroundColor="#FF4081"
-                                            onData={onRecordData}
-                                            onStop={onRecordStop}
-                                            className={classes.reactMic}
-                                        />
-                                        <Button
-                                            onClick={startRecording}
+                                        <Grid
+                                            container
+                                            justify={"center"}
+                                            direction={"column"}
+                                            alignItems={"center"}
                                         >
-                                            Start Record
-                                        </Button>
+                                            <Grid
+                                                item
+                                            >
+                                                <ReactMic
+                                                    record={record}
+                                                    strokeColor="#000000"
+                                                    backgroundColor="#FF4081"
+                                                    onData={onRecordData}
+                                                    onStop={onRecordStop}
+                                                    className={classes.reactMic}
+                                                />
+                                            </Grid>
 
-                                        <Button
-                                            onClick={stopRecording}
-                                        >
-                                            Stop Record
-                                        </Button>
+                                            <Grid
+                                                item
+                                            >
+                                                {!record && <Button
+                                                    onClick={startRecording}
+                                                >
+                                                    Start Record
+                                                </Button>}
+
+                                                {record && <Button
+                                                    onClick={stopRecording}
+                                                >
+                                                    Stop Record
+                                                </Button>}
+                                            </Grid>
+                                        </Grid>
                                     </CardContent>
                                 </ClickAwayListener>
                             </Card>

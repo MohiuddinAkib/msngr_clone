@@ -457,6 +457,14 @@ const MessageListComponent: React.FC = (props) => {
                                                                 src={eachMessageItem.downloadURL}
                                                             />
                                                         )}
+
+                                                        {eachMessageItem.contentType === "audio/webm;codecs=opus" && (
+                                                            <audio
+                                                                controls
+                                                                className={classes.file}
+                                                                src={eachMessageItem.downloadURL}
+                                                            />
+                                                        )}
                                                     </div>
                                                 </div>
                                             )

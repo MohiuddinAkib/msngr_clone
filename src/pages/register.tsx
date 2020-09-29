@@ -16,6 +16,7 @@ import CardActions from "@material-ui/core/CardActions";
 import CardContent from "@material-ui/core/CardContent";
 import LockOutlinedIcon from "@material-ui/icons/LockOutlined";
 import {createStyles, makeStyles} from "@material-ui/core/styles";
+import withGuest from "@components/auth/withGuest";
 
 const useStyles = makeStyles((theme) => createStyles({
     container: {
@@ -217,4 +218,4 @@ const Register: NextPage = () => {
     );
 };
 
-export default Register;
+export default withGuest(Register);

@@ -1,5 +1,6 @@
 import React from "react";
 import {NextPage} from "next";
+import withAuth from "@components/auth/withAuth";
 import MessengerLayout from "@layouts/MessengerLayout";
 import MessengerProvider from "@src/context/messenger";
 import MessageListComponent from "@containers/messenger/MessageList";
@@ -23,4 +24,4 @@ const Conversation: NextPage = (props) => {
     );
 };
 
-export default Conversation;
+export default withAuth(Conversation);

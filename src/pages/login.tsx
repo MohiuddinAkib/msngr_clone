@@ -2,6 +2,7 @@ import React from "react";
 import {NextPage} from "next";
 import NextLink from "next/link";
 import {useRouter} from "next/router";
+import Cookies from "universal-cookie"
 import Grid from "@material-ui/core/Grid";
 import {Field, Form, Formik} from "formik";
 import Paper from "@material-ui/core/Paper";
@@ -16,6 +17,7 @@ import CardContent from "@material-ui/core/CardContent";
 import CardActions from "@material-ui/core/CardActions";
 import LockOutlinedIcon from '@material-ui/icons/LockOutlined';
 import {makeStyles, createStyles} from "@material-ui/core/styles";
+import withGuest from "@components/auth/withGuest";
 
 const useStyles = makeStyles((theme) => createStyles({
     container: {
@@ -53,8 +55,11 @@ const Login: NextPage = () => {
     }
 
     const handleFormSubmit = async (values: typeof initialValues) => {
+        const cookies = new Cookies();
         try {
             await firebase.login(values)
+            const token = await firebase.auth().currentUser.getIdToken()
+            cookies.set("auth", token)
             const redirecPath = router.query.next as string || "/"
             router.replace(redirecPath)
         } catch (e) {
@@ -177,4 +182,4 @@ const Login: NextPage = () => {
     );
 };
 
-export default Login;
+export default withGuest(Login);

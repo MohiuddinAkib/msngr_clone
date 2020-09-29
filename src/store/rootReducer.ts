@@ -38,7 +38,7 @@ export interface UserMessage {
     size?: number;
     fullPath?: string;
     downloadURL?: string;
-    contentType?: "image/jpeg" | "video/webm;codecs=vp8";
+    contentType?: "image/jpeg" | "video/webm;codecs=vp8" | "audio/webm;codecs=opus";
     customMetadata?: Object;
     deleted_at: string | null;
     updated_at?: string
