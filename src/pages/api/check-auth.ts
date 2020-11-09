@@ -27,14 +27,15 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
     await runMiddleware(req, res, cors)
 
     try {
-        const token = req.headers.authorization as string || ""
+        const token = req.headers.authorization as string
 
-        if (!token) {
+        if (token === "undefined") {
             return res.status(403)
                 .json({
                     msg: "Auth token missing",
                 })
         }
+
         const decoded = await admin.auth().verifyIdToken(token)
         if (!decoded) {
             return res.status(401)

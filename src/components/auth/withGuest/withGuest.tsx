@@ -1,55 +1,27 @@
 import React from "react";
 import {NextPage} from "next";
-import Router from "next/router";
-import Cookies from "universal-cookie";
+import {useRouter} from "next/router";
+import {AuthContext} from "@src/context/messenger/auth";
 
-const WithGuest = (WrappedComponent: NextPage): NextPage => {
-    return class GuestComponent extends React.Component {
-        static async getInitialProps(ctx) {
-            const cookeis = new Cookies(ctx.req && ctx.req.headers.cookie)
-            const idToken = cookeis.get("auth")
+const withGuest = <T extends {}>(WrappedComponent: React.FC<T> | NextPage<T>) => {
+    const Wrapper: React.FC<T> = props => {
+        const router = useRouter()
+        const authContext = React.useContext(AuthContext)
+        const [render, setRender] = React.useState(false)
 
-            try {
-                const res = await fetch("http://localhost:3000/api/check-auth", {
-                    headers: {
-                        "Authorization": idToken,
-                        "Content-Type": "application/json",
-                    }
-                })
-                const data = await res.json()
-
-                if (res.ok || data.msg === "Authenticated") {
-                    if (ctx.res) {
-                        // server
-                        // 303: "See other"
-                        ctx.res.writeHead(303, {Location: `/`});
-                        ctx.res.end();
-                    } else {
-                        // In the browser, we just pretend like this never even happened ;)
-                        Router.back();
-                    }
-                    return {};
-                }
-
-            } catch (e) {
-                if (ctx.res) {
-                    // server
-                    // 303: "See other"
-                    ctx.res.writeHead(303, {Location: `/`});
-                    ctx.res.end();
-                } else {
-                    // In the browser, we just pretend like this never even happened ;)
-                    Router.back();
-                }
+        React.useEffect(() => {
+            if (authContext.authenticated) {
+                const redirecPath = router.query.next as string || "/"
+                router.replace({pathname: redirecPath})
+            } else {
+                setRender(true)
             }
+        }, [authContext.authenticated])
 
-            return {};
-        }
+        return render && <WrappedComponent {...props} />
+    }
 
-        render() {
-            return <WrappedComponent {...this.props} />;
-        }
-    };
-};
+    return Wrapper
+}
 
-export default WithGuest;
+export default withGuest;

@@ -1,24 +1,18 @@
 import React from "react";
 import propTypes from "prop-types"
-import {useRouter} from "next/router";
-import Cookies from "universal-cookie"
-import {useSelector} from "react-redux";
 import Grid from "@material-ui/core/Grid";
 import List from "@material-ui/core/List";
 import Slide from "@material-ui/core/Slide";
-import {Profile} from "@store/rootReducer";
 import Avatar from "@material-ui/core/Avatar";
 import AppBar from "@material-ui/core/AppBar";
 import Hidden from "@material-ui/core/Hidden";
 import Dialog from "@material-ui/core/Dialog";
 import Switch from "@material-ui/core/Switch";
 import Toolbar from "@material-ui/core/Toolbar";
-import {RootState} from "@store/configureStore";
 import ListItem from "@material-ui/core/ListItem";
 import Skeleton from '@material-ui/lab/Skeleton';
 import CreateIcon from "@material-ui/icons/Create";
 import Typography from "@material-ui/core/Typography";
-import {useErrorHandler} from "react-error-boundary";
 import IconButton from "@material-ui/core/IconButton";
 import SettingsIcon from "@material-ui/icons/Settings";
 import {MessengerContext} from "@src/context/messenger";
@@ -36,6 +30,7 @@ import FiberManualRecordIcon from '@material-ui/icons/FiberManualRecord';
 import {TransitionProps} from "@material-ui/core/transitions/transition";
 import {FirebaseReducer, isLoaded, useFirebase} from "react-redux-firebase";
 import ListItemSecondaryAction from "@material-ui/core/ListItemSecondaryAction";
+import {AuthContext} from "@src/context/messenger/auth";
 
 interface Props {
     trigger: boolean
@@ -71,46 +66,37 @@ const Transition = React.forwardRef(function Transition(
 
 const ListDrawerHeaderComponent: React.FC<Props> = (props) => {
     const theme = useTheme()
-    const router = useRouter()
     const classes = useStyles()
-    const firebase = useFirebase()
-    const handleError = useErrorHandler()
+    const authContext = React.useContext(AuthContext)
     const messengerContext = React.useContext(MessengerContext)
     const atMdAndLg = useMediaQuery(theme.breakpoints.between("md", "lg"))
-    const [openProfileMenu, setOpenProfileMenu] = React.useState(false)
-    const profile = useSelector<RootState, FirebaseReducer.Profile<Profile>>(state => state.firebase.profile)
-
-    const showProfileMenu = () => {
-        setOpenProfileMenu(true)
-    }
-
-    const hideProfileMenu = () => {
-        setOpenProfileMenu(false)
-    }
-
-    const handleLogout = async () => {
-        const cookies = new Cookies()
-        try {
-            await firebase.logout()
-            cookies.remove("auth")
-            router.replace("/login")
-        } catch (error) {
-            handleError(error)
-        }
-    }
 
     return (
         <>
-            <AppBar position={"absolute"} elevation={props.trigger ? 1 : 0} color={"inherit"}>
+            <AppBar
+                color={"inherit"}
+                position={"absolute"}
+                elevation={props.trigger ? 1 : 0}
+            >
                 <Toolbar>
-                    <Grid container justify={"space-between"} alignItems={"center"}>
-                        <Grid item container xs={6} spacing={2} alignItems={"center"}>
+                    <Grid
+                        container
+                        alignItems={"center"}
+                        justify={"space-between"}
+                    >
+                        <Grid
+                            item
+                            xs={6}
+                            container
+                            spacing={2}
+                            alignItems={"center"}
+                        >
                             <Grid item>
                                 <Avatar
                                     sizes={"large"}
                                     alt={"john doe"}
+                                    onClick={messengerContext.showProfileMenu}
                                     src={"https://picsum.photos/200/300?grayscale&random=2"}
-                                    onClick={showProfileMenu}
                                 />
                             </Grid>
                             <Grid item>
@@ -145,9 +131,9 @@ const ListDrawerHeaderComponent: React.FC<Props> = (props) => {
             >
                 <Dialog
                     fullScreen
-                    open={openProfileMenu}
-                    onClose={hideProfileMenu}
                     TransitionComponent={Transition}
+                    open={messengerContext.openProfileMenu}
+                    onClose={messengerContext.hideProfileMenu}
                 >
                     <AppBar
                         elevation={0}
@@ -157,8 +143,8 @@ const ListDrawerHeaderComponent: React.FC<Props> = (props) => {
                             <IconButton
                                 edge="start"
                                 color="inherit"
-                                onClick={hideProfileMenu}
                                 aria-label="close"
+                                onClick={messengerContext.hideProfileMenu}
                             >
                                 <ArrowBackIcon/>
                             </IconButton>
@@ -177,11 +163,11 @@ const ListDrawerHeaderComponent: React.FC<Props> = (props) => {
                         src={"https://picsum.photos/200/300?grayscale&random=2"}
                     />
 
-                    {!isLoaded(profile) ? <Skeleton variant="text"/> : <Typography
+                    {!isLoaded(messengerContext.profileLoading) ? <Skeleton variant="text"/> : <Typography
                         variant={"h4"}
                         align={"center"}
                     >
-                        {profile.first_name} {profile.last_name}
+                        {messengerContext.profile.first_name} {messengerContext.profile.last_name}
                     </Typography>}
 
                     <List>
@@ -240,7 +226,7 @@ const ListDrawerHeaderComponent: React.FC<Props> = (props) => {
 
                         <ListItem
                             button
-                            onClick={handleLogout}
+                            onClick={authContext.handleLogout}
                         >
                             <ListItemIcon>
                                 <ExitToAppIcon/>

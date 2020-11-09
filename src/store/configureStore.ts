@@ -44,5 +44,13 @@ export type RootState = ReturnType<typeof store.getState>
 export const useAppDispatch = () => useDispatch<AppDispatch>()
 export type AppThunk = ThunkAction<void, RootState, unknown, Action<string>>
 
-export const wrapper = createWrapper<RootState>(makeStore, {debug: true});
+export const wrapper = createWrapper<RootState>(makeStore, {
+    debug: true,
+    serializeState: state => {
+        return JSON.stringify(state)
+    },
+    deserializeState: state => {
+        return JSON.parse(state)
+    }
+});
 

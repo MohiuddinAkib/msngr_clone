@@ -1,4 +1,5 @@
 import React from "react";
+import {useRouter} from "next/router";
 import styled from "styled-components";
 import Grid from "@material-ui/core/Grid";
 import Avatar from "@material-ui/core/Avatar";
@@ -38,7 +39,14 @@ const useStyles = makeStyles((theme) => createStyles({
 }))
 
 const HeaderComponent: React.FC = (props) => {
+    const router = useRouter();
     const classes = useStyles();
+
+    const gotoMessages = () => {
+        router.push({
+            pathname: "/messages"
+        })
+    }
 
     return (
         <Header
@@ -55,20 +63,12 @@ const HeaderComponent: React.FC = (props) => {
                         <Hidden
                             lgUp
                         >
-                            {/*<IconButton*/}
-                            {/*    onClick={messengerContext.handleMessageComponentsVisibility}*/}
-                            {/*>*/}
-                            {/*    <ArrowBackIcon/>*/}
-                            {/*</IconButton>*/}
-                            <SidebarTrigger
-                                color={"primary"}
-                                sidebarId="left_sidebar"
-                                className={classes.conversationListTrigger}
+                            <IconButton
+                                onClick={gotoMessages}
                             >
-                                {({open, anchor}) => {
-                                    return <ArrowBackIcon/>
-                                }}
-                            </SidebarTrigger>
+                                <ArrowBackIcon/>
+                            </IconButton>
+
                             <SidebarTrigger
                                 color={"primary"}
                                 sidebarId={"right_sidebar"}

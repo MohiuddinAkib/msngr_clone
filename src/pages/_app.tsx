@@ -10,11 +10,11 @@ import {StylesProvider} from "@material-ui/styles";
 import CssBaseline from "@material-ui/core/CssBaseline";
 import {createFirestoreInstance} from "redux-firestore"
 import {RootState, wrapper} from "@store/configureStore";
+import {AuthProvider} from "@src/context/messenger/auth";
 import "@webscopeio/react-textarea-autocomplete/style.css";
 import {ReactReduxFirebaseProvider} from "react-redux-firebase"
 import {ErrorBoundary, FallbackProps} from "react-error-boundary"
-import AuthIsLoadedComponent from "@components/auth/AuthIsLoaded";
-
+import {MessengerProvider} from "@src/context/messenger";
 
 const ErrorFallback: React.FC<FallbackProps> = ({error, resetErrorBoundary}) => {
     return (
@@ -72,9 +72,11 @@ const MyApp: React.FC<AppProps> = (props) => {
                                 onReset={resetErrorBoundary}
                                 FallbackComponent={ErrorFallback}
                             >
-                                <AuthIsLoadedComponent>
-                                    <Component {...pageProps} />
-                                </AuthIsLoadedComponent>
+                                <AuthProvider>
+                                    <MessengerProvider>
+                                        <Component {...pageProps} />
+                                    </MessengerProvider>
+                                </AuthProvider>
                             </ErrorBoundary>
                         </ReactReduxFirebaseProvider>
                     )

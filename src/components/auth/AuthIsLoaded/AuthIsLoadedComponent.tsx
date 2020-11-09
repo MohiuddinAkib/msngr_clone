@@ -21,17 +21,14 @@ const AuthIsLoadedComponent: React.FC = (props) => {
     const auth = useSelector<RootState>(state => state.firebase.auth)
 
     return (<>
-        <NoSsr>
+        {isLoaded(auth) ? props.children : <NoSsr>
             <Backdrop
-                open={!isLoaded(auth)}
-                // onClick={handleClose}
+                open
                 className={classes.backdrop}
             >
                 <CircularProgress color="inherit"/>
             </Backdrop>
-        </NoSsr>
-
-        {isLoaded(auth) && props.children}
+        </NoSsr>}
     </>)
 };
 

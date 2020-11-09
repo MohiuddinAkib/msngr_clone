@@ -3,7 +3,7 @@ import Head from "next/head"
 import styled from "styled-components";
 import {SafeAreaView} from "react-native";
 import CssBaseline from "@material-ui/core/CssBaseline";
-import {MessengerContext} from "@src/context/messenger";
+import {MessengerContext} from "@src/context/messenger/messenger";
 import Layout, {Root, getFullscreen} from "@mui-treasury/layout";
 import createMuiTheme from "@material-ui/core/styles/createMuiTheme";
 import responsiveFontSizes from "@material-ui/core/styles/responsiveFontSizes";

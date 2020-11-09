@@ -5,7 +5,8 @@ import Hidden from "@material-ui/core/Hidden";
 import {Scrollbars} from "react-custom-scrollbars";
 import PeopleIcon from "@material-ui/icons/People";
 import {getDrawerSidebar} from "@mui-treasury/layout";
-import {MessengerContext} from "@src/context/messenger";
+import MessagesPeopleTab from "@layouts/MessagesPeopleTab";
+import {MessengerContext} from "@src/context/messenger/messenger";
 import {createStyles, makeStyles} from "@material-ui/core/styles";
 import BottomNavigation from "@material-ui/core/BottomNavigation";
 import PeopleListComponent from "@containers/messenger/PeopleList";
@@ -34,13 +35,8 @@ const useStyles = makeStyles(theme => createStyles({
 
 const ListDrawerComponent: React.FC = (props) => {
     const classes = useStyles()
-    const [view, setView] = React.useState(0)
     const messengerContext = React.useContext(MessengerContext)
     const [trigger, setTrigger] = React.useState(false)
-
-    const handleViewNavigation = (event: React.ChangeEvent, newValue: number) => {
-        setView(newValue)
-    }
 
     const handleDrawerScroll = (event: React.UIEvent<HTMLDivElement, UIEvent>) => {
         const scrollTop = (event.target as HTMLDivElement).scrollTop
@@ -60,33 +56,7 @@ const ListDrawerComponent: React.FC = (props) => {
             <ListDrawerHeaderComponent
                 trigger={trigger}
             />
-            <Scrollbars
-                universal
-                style={{
-                    height: "100vh",
-                }}
-            >
-                {view === 0 && <ConversationListComponent/>}
-                {view === 1 && <PeopleListComponent/>}
-            </Scrollbars>
-
-            <Hidden
-                lgUp
-            >
-                <BottomNavigation
-                    value={view}
-                    onChange={handleViewNavigation}
-                >
-                    <BottomNavigationAction
-                        label="Chats"
-                        icon={<ChatIcon/>}
-                    />
-                    <BottomNavigationAction
-                        label="People"
-                        icon={<PeopleIcon/>}
-                    />
-                </BottomNavigation>
-            </Hidden>
+            <ConversationListComponent/>
         </DrawerSidebar>
     );
 };

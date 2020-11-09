@@ -24,4 +24,5 @@ export const COLLECTIONS = {
     conversations: "conversations",
     participants: "participants",
     messages: "messages",
+    users: "users",
 }

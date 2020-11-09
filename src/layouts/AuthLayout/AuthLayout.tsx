@@ -4,10 +4,12 @@ import CssBaseline from "@material-ui/core/CssBaseline";
 
 const AuthLayout: React.FC = (props) => {
     return (
-        <Container maxWidth="md">
-            <CssBaseline/>
-            {props.children}
-        </Container>
+        <div>
+            <Container maxWidth="md">
+                <CssBaseline/>
+                {props.children}
+            </Container>
+        </div>
     );
 };
 

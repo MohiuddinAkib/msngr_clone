@@ -141,7 +141,7 @@ const MessageListComponent: React.FC = (props) => {
     const conversationMessages = useSelector<RootState, { [key: string]: UserMessage }>(state => state.firestore.data[`messages-${router.query.conversation_uid}`])
 
     React.useEffect(() => {
-        if (conversationMessages && isLoaded(conversationMessages) && !isEmpty(conversationMessages)) {
+        if (isLoaded(conversationMessages) && !isEmpty(conversationMessages)) {
             const formattedMessages: { key: string; messages: UserMessage[] }[] = [];
             let matched = 0;
             let counter = 0;
@@ -163,6 +163,9 @@ const MessageListComponent: React.FC = (props) => {
             }
 
             setMessages(formattedMessages)
+        }
+        if (isLoaded(conversationMessages) && isEmpty(conversationMessages)) {
+            setMessages([])
         }
     }, [conversationMessages])
 

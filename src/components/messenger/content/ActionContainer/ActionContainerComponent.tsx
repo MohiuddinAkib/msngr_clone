@@ -24,6 +24,7 @@ import IconButton from "@material-ui/core/IconButton";
 import Typography from "@material-ui/core/Typography";
 import {useErrorHandler} from "react-error-boundary";
 import CardContent from "@material-ui/core/CardContent";
+import cameraShutter from "@assets/camera-shutter.mp3"
 import {withResizeDetector} from "react-resize-detector";
 import useTheme from "@material-ui/core/styles/useTheme";
 import DialogTitle from "@material-ui/core/DialogTitle";
@@ -106,7 +107,7 @@ const ActionContainerComponent: React.FC<Props> = (props) => {
     const mediaRecorderRef = React.useRef<MediaRecorder>(null);
     const previewVideoRef = React.useRef<HTMLVideoElement>(null);
 
-    const [playCameraShutterSound] = useSound("/camera-shutter.mp3");
+    const [playCameraShutterSound] = useSound(cameraShutter);
     const [openCameraDialog, setOpenCameraDialog] = React.useState(false)
     const [capturingVideo, setCapturingVideo] = React.useState(false);
     const [videoChunks, setVideoChunks] = React.useState<Blob[]>([]);
@@ -117,6 +118,7 @@ const ActionContainerComponent: React.FC<Props> = (props) => {
     const [capturingScreenShot, setCapturingScreenshot] = React.useState(false);
     const [screenshotPreviewBlob, setScreenshotPreviewBlob] = React.useState("");
 
+    const [audioSending, setAudioSending] = React.useState(false)
     const [openBtn, setOpenBtn] = React.useState(false)
     const pc = useMediaQuery(theme.breakpoints.up("md"))
     const [record, setRecord] = React.useState(false)
@@ -158,9 +160,9 @@ const ActionContainerComponent: React.FC<Props> = (props) => {
     const onRecordData = (recordedBlob: Blob) => {
     }
 
-    const onRecordStop = async (recordedBlob: ReactMicStopEvent) => {
+    const onRecordStop = async (recordedBlob: ReactMicStopEvent & { options: { mimeType: string } }) => {
         if (isLoaded(auth) && !isEmpty(auth)) {
-            // setVideoSending(true)
+            setAudioSending(true)
             // previewVideoRef.current.pause()
             try {
                 await firebase.uploadFile(
@@ -195,13 +197,7 @@ const ActionContainerComponent: React.FC<Props> = (props) => {
             } catch (error) {
                 // handleError(error)
             } finally {
-                // setVideoChunks([])
-                // setCapturingVideo(false)
-                // setScreenshotPreviewBlob("")
-                // setVideoRecordPreviewBlob("")
-                // setCapturingScreenshot(false)
-                // handleCameraDialogClose()
-                // setVideoSending(false)
+                setAudioSending(false)
             }
         }
 
@@ -632,6 +628,7 @@ const ActionContainerComponent: React.FC<Props> = (props) => {
                                             >
                                                 {!record && <Button
                                                     onClick={startRecording}
+                                                    disabled={audioSending}
                                                 >
                                                     Start Record
                                                 </Button>}

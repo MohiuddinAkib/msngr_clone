@@ -3,7 +3,7 @@ import Head from "next/head"
 import styled from "styled-components";
 import CssBaseline from "@material-ui/core/CssBaseline";
 import {makeMessengerTheme} from "@src/theme/messenger";
-import {MessengerContext} from "@src/context/messenger";
+import {MessengerContext} from "@src/context/messenger/messenger";
 import Layout, {Root, getFullscreen, getHeader, getSidebarTrigger} from "@mui-treasury/layout";
 import Toolbar from "@material-ui/core/Toolbar";
 import Grid from "@material-ui/core/Grid";

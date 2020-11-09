@@ -1,18 +1,15 @@
 import React from "react";
-import {useSelector} from "react-redux";
 import List from "@material-ui/core/List";
-import {COLLECTIONS} from "@config/firebase";
-import {isLoaded} from "react-redux-firebase";
 import {Conversation} from "@store/rootReducer";
-import {RootState} from "@store/configureStore";
-import Skeleton from "@material-ui/lab/Skeleton";
 import SearchIcon from "@material-ui/icons/Search";
 import TextField from "@material-ui/core/TextField";
 import IconButton from "@material-ui/core/IconButton";
+import {isEmpty, isLoaded} from "react-redux-firebase";
+import {MessengerContext} from "@src/context/messenger";
 import ListSubheader from "@material-ui/core/ListSubheader";
 import InputAdornment from "@material-ui/core/InputAdornment";
 import {createStyles, makeStyles} from "@material-ui/core/styles";
-import ListItemComponent from "@components/messenger/convesation/ListItem";
+import ConversationItemComponent from "@components/messenger/convesation/Item";
 
 const useStyles = makeStyles(theme => createStyles({
     textFieldRoot: {
@@ -28,12 +25,12 @@ const useStyles = makeStyles(theme => createStyles({
 
 const ConversationListComponent: React.FC = () => {
     const classes = useStyles()
-    const conversations = useSelector<RootState, { [key: string]: Conversation }>(state => state.firestore.data[COLLECTIONS.conversations])
+    const messengerContext = React.useContext(MessengerContext)
 
-    const items = isLoaded(conversations) && Object
-        .entries(conversations)
+    const items = (isLoaded(messengerContext.conversations) && !isEmpty(messengerContext.conversations)) && Object
+        .entries(messengerContext.conversations as { [key: string]: Conversation })
         .map(([key, conversation]) => (
-            <ListItemComponent
+            <ConversationItemComponent
                 key={key}
                 conversationId={key}
                 conversation={conversation}

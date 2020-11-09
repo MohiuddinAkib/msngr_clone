@@ -1,13 +1,13 @@
 import React from "react";
 import List from "@material-ui/core/List";
+import ListItem from "@material-ui/core/ListItem";
 import SearchIcon from "@material-ui/icons/Search";
 import TextField from "@material-ui/core/TextField";
 import IconButton from "@material-ui/core/IconButton";
+import ListItemText from "@material-ui/core/ListItemText";
 import ListSubheader from "@material-ui/core/ListSubheader";
 import InputAdornment from "@material-ui/core/InputAdornment";
 import {createStyles, makeStyles} from "@material-ui/core/styles";
-import ListItem from "@material-ui/core/ListItem";
-import ListItemText from "@material-ui/core/ListItemText";
 
 const useStyles = makeStyles(theme => createStyles({
     textFieldRoot: {
