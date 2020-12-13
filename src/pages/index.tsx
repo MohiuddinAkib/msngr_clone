@@ -1,32 +1,23 @@
-// @generated: @expo/next-adapter@2.1.29
 import React from "react";
 import Link from "next/link";
-import {NextPage, GetServerSideProps} from "next";
-import {Text, View} from "react-native";
-import MUILink from "@material-ui/core/Link"
+import { NextPage } from "next";
+import Box from "@material-ui/core/Box";
+import MUILink from "@material-ui/core/Link";
 import withAuth from "@components/auth/withAuth";
-import { getServerSidePropsPrivate } from "@src/utils/auth";
+import ButtonLinkComponent from "@components/common/ButtonLink";
 
 const App: NextPage = () => {
-    return (
-        <View
-        >
-            <Text
-            >
-                Welcome to Expo + Next.js 👋
-            </Text>
+  return (
+    <Box>
+      <ButtonLinkComponent href={"/messages"} as={"/messages"}>
+        Go to messages
+      </ButtonLinkComponent>
 
-            <Link href={"/messages"} passHref>
-                <MUILink>Go to messages</MUILink>
-            </Link>
+      <Link href={"/login"} passHref>
+        <MUILink>Go to messages</MUILink>
+      </Link>
+    </Box>
+  );
+};
 
-            <Link href={"/login"} passHref>
-                <MUILink>Go to messages</MUILink>
-            </Link>
-        </View>
-    );
-}
-
-export default withAuth(App)
-
-// export const getServerSideProps: GetServerSideProps = getServerSidePropsPrivate()
+export default withAuth(App);

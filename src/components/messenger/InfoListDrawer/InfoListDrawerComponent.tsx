@@ -21,200 +21,214 @@ import ExpandMoreIcon from "@material-ui/icons/ExpandMore";
 import TripOriginIcon from "@material-ui/icons/TripOrigin";
 import NotificationsIcon from "@material-ui/icons/Notifications";
 import KeyboardArrowLeftIcon from "@material-ui/icons/KeyboardArrowLeft";
-import {createStyles, makeStyles, useTheme} from "@material-ui/core/styles";
+import { createStyles, makeStyles, useTheme } from "@material-ui/core/styles";
 import ListItemSecondaryAction from "@material-ui/core/ListItemSecondaryAction";
-import {getSidebarContent, getDrawerSidebar, getSidebarTrigger, getHeader} from "@mui-treasury/layout";
+import {
+  getSidebarContent,
+  getDrawerSidebar,
+  getSidebarTrigger,
+  getHeader,
+} from "@mui-treasury/layout";
 
 const Header = getHeader(styled);
 const DrawerSidebar = getDrawerSidebar(styled);
-const SidebarContent = getSidebarContent(styled)
-const SidebarTrigger = getSidebarTrigger(styled)
+const SidebarContent = getSidebarContent(styled);
+const SidebarTrigger = getSidebarTrigger(styled);
 
-const useStyles = makeStyles(theme => createStyles({
+const useStyles = makeStyles((theme) =>
+  createStyles({
     infoDrawerPaper: {},
     profileAvatar: {
-        margin: "auto",
-        height: 100,
-        width: 100
+      margin: "auto",
+      height: 100,
+      width: 100,
     },
     profileNameRoot: {
-        fontWeight: "bold",
-        textAlign: "center"
+      fontWeight: "bold",
+      textAlign: "center",
     },
     activeStatusRoot: {
-        textAlign: "center"
+      textAlign: "center",
     },
-}))
+  })
+);
 
 const InfoListDrawerComponent: React.FC = (props) => {
-    const theme = useTheme()
-    const classes = useStyles()
-    const [showMoreActions, setShowMoreActions] = React.useState(false)
-    const [showPrivacyAndPolicy, setShowPrivacyAndPolicy] = React.useState(false)
+  const theme = useTheme();
+  const classes = useStyles();
+  const [showMoreActions, setShowMoreActions] = React.useState(false);
+  const [showPrivacyAndPolicy, setShowPrivacyAndPolicy] = React.useState(false);
 
-    const handleMoreActionsCollapse = () => {
-        setShowMoreActions(prevState => !prevState)
-    }
+  const handleMoreActionsCollapse = () => {
+    setShowMoreActions((prevState) => !prevState);
+  };
 
-    const handleShowPrivacyAndPolicy = () => {
-        setShowPrivacyAndPolicy(prevState => !prevState)
-    }
+  const handleShowPrivacyAndPolicy = () => {
+    setShowPrivacyAndPolicy((prevState) => !prevState);
+  };
 
-    return (
-        <DrawerSidebar
-            sidebarId={"right_sidebar"}
-            classes={{paper: classes.infoDrawerPaper}}
-        >
-            <SidebarContent>
-                <SidebarTrigger
-                    color={"primary"}
-                    sidebarId="left_sidebar"
-                >
-                    {({open, anchor}) => {
-                        return <ArrowBackIcon/>
-                    }}
-                </SidebarTrigger>
+  return (
+    <DrawerSidebar
+      sidebarId={"right_sidebar"}
+      classes={{ paper: classes.infoDrawerPaper }}
+    >
+      <SidebarContent>
+        <SidebarTrigger color={"primary"} sidebarId="left_sidebar">
+          {({ open, anchor }) => {
+            return <ArrowBackIcon />;
+          }}
+        </SidebarTrigger>
 
-                <Toolbar/>
-                <CardContent>
-                    <Avatar
-                        className={classes.profileAvatar}
-                        src={"https://picsum.photos/200/300?random=3"}
-                    />
-                    <CardHeader
-                        titleTypographyProps={{
-                            classes: {
-                                root: classes.profileNameRoot
-                            }
-                        }}
-                        subheaderTypographyProps={{
-                            classes: {
-                                root: classes.activeStatusRoot
-                            }
-                        }}
-                        title={"John doe"}
-                        subheader={"Active 15min ago"}
-                    />
-                    {/*TODO: presence implementation*/}
-                </CardContent>
-                <List>
-                    <Divider component={"li"}/>
-                    <ListItem button onClick={handleMoreActionsCollapse}>
-                        <ListItemText
-                            primary="MORE ACTIONS"
-                            primaryTypographyProps={{
-                                variant: "overline"
-                            }}/>
+        <Toolbar />
+        <CardContent>
+          <Avatar
+            className={classes.profileAvatar}
+            src={"https://picsum.photos/200/300?random=3"}
+          />
+          <CardHeader
+            titleTypographyProps={{
+              classes: {
+                root: classes.profileNameRoot,
+              },
+            }}
+            subheaderTypographyProps={{
+              classes: {
+                root: classes.activeStatusRoot,
+              },
+            }}
+            title={"John doe"}
+            subheader={"Active 15min ago"}
+          />
+          {/*TODO: presence implementation*/}
+        </CardContent>
+        <List>
+          <Divider component={"li"} />
+          <ListItem button onClick={handleMoreActionsCollapse}>
+            <ListItemText
+              primary="MORE ACTIONS"
+              primaryTypographyProps={{
+                variant: "overline",
+              }}
+            />
 
-                        <ListItemSecondaryAction>
-                            <IconButton onClick={handleMoreActionsCollapse}>
-                                {showMoreActions ? <ExpandMoreIcon/> : <KeyboardArrowLeftIcon/>}
-                            </IconButton>
-                        </ListItemSecondaryAction>
-                    </ListItem>
+            <ListItemSecondaryAction>
+              <IconButton onClick={handleMoreActionsCollapse}>
+                {showMoreActions ? (
+                  <ExpandMoreIcon />
+                ) : (
+                  <KeyboardArrowLeftIcon />
+                )}
+              </IconButton>
+            </ListItemSecondaryAction>
+          </ListItem>
 
-                    <Collapse in={showMoreActions} timeout="auto" unmountOnExit>
-                        <List component="div" disablePadding>
-                            <ListItem>
-                                <ListItemText primary={"Search in conversation"}/>
-                                <ListItemSecondaryAction>
-                                    <IconButton>
-                                        <SearchIcon/>
-                                    </IconButton>
-                                </ListItemSecondaryAction>
-                            </ListItem>
+          <Collapse in={showMoreActions} timeout="auto" unmountOnExit>
+            <List component="div" disablePadding>
+              <ListItem>
+                <ListItemText primary={"Search in conversation"} />
+                <ListItemSecondaryAction>
+                  <IconButton>
+                    <SearchIcon />
+                  </IconButton>
+                </ListItemSecondaryAction>
+              </ListItem>
 
-                            <ListItem>
-                                <ListItemText primary={"Edit Nicknames"}/>
-                                <ListItemSecondaryAction>
-                                    <IconButton>
-                                        <EditIcon/>
-                                    </IconButton>
-                                </ListItemSecondaryAction>
-                            </ListItem>
+              <ListItem>
+                <ListItemText primary={"Edit Nicknames"} />
+                <ListItemSecondaryAction>
+                  <IconButton>
+                    <EditIcon />
+                  </IconButton>
+                </ListItemSecondaryAction>
+              </ListItem>
 
-                            <ListItem>
-                                <ListItemText primary={"Change theme"}/>
-                                <ListItemSecondaryAction>
-                                    <IconButton>
-                                        <TripOriginIcon/>
-                                    </IconButton>
-                                </ListItemSecondaryAction>
-                            </ListItem>
+              <ListItem>
+                <ListItemText primary={"Change theme"} />
+                <ListItemSecondaryAction>
+                  <IconButton>
+                    <TripOriginIcon />
+                  </IconButton>
+                </ListItemSecondaryAction>
+              </ListItem>
 
-                            <ListItem>
-                                <ListItemText primary={"Change emoji"}/>
-                                <ListItemSecondaryAction>
-                                    <IconButton>
-                                        <ThumbUpIcon/>
-                                    </IconButton>
-                                </ListItemSecondaryAction>
-                            </ListItem>
-                        </List>
-                    </Collapse>
+              <ListItem>
+                <ListItemText primary={"Change emoji"} />
+                <ListItemSecondaryAction>
+                  <IconButton>
+                    <ThumbUpIcon />
+                  </IconButton>
+                </ListItemSecondaryAction>
+              </ListItem>
+            </List>
+          </Collapse>
 
-                    <Divider component={"li"}/>
+          <Divider component={"li"} />
 
-                    <ListItem button onClick={handleShowPrivacyAndPolicy}>
-                        <ListItemText
-                            primary="PRIVACY AND SUPPORT"
-                            primaryTypographyProps={{
-                                variant: "overline"
-                            }}/>
+          <ListItem button onClick={handleShowPrivacyAndPolicy}>
+            <ListItemText
+              primary="PRIVACY AND SUPPORT"
+              primaryTypographyProps={{
+                variant: "overline",
+              }}
+            />
 
-                        <ListItemSecondaryAction>
-                            <IconButton onClick={handleShowPrivacyAndPolicy}>
-                                {showPrivacyAndPolicy ? <ExpandMoreIcon/> : <KeyboardArrowLeftIcon/>}
-                            </IconButton>
-                        </ListItemSecondaryAction>
-                    </ListItem>
+            <ListItemSecondaryAction>
+              <IconButton onClick={handleShowPrivacyAndPolicy}>
+                {showPrivacyAndPolicy ? (
+                  <ExpandMoreIcon />
+                ) : (
+                  <KeyboardArrowLeftIcon />
+                )}
+              </IconButton>
+            </ListItemSecondaryAction>
+          </ListItem>
 
-                    <Collapse in={showPrivacyAndPolicy} timeout="auto" unmountOnExit>
-                        <List component="div" disablePadding>
-                            <ListItem>
-                                <ListItemText primary={"Notifications"}/>
-                                <ListItemSecondaryAction>
-                                    <IconButton>
-                                        <NotificationsIcon/>
-                                    </IconButton>
-                                </ListItemSecondaryAction>
-                            </ListItem>
+          <Collapse in={showPrivacyAndPolicy} timeout="auto" unmountOnExit>
+            <List component="div" disablePadding>
+              <ListItem>
+                <ListItemText primary={"Notifications"} />
+                <ListItemSecondaryAction>
+                  <IconButton>
+                    <NotificationsIcon />
+                  </IconButton>
+                </ListItemSecondaryAction>
+              </ListItem>
 
-                            <ListItem>
-                                <ListItemText primary={"Ignore messages"}/>
-                                <ListItemSecondaryAction>
-                                    <IconButton>
-                                        <ReportOffIcon/>
-                                    </IconButton>
-                                </ListItemSecondaryAction>
-                            </ListItem>
+              <ListItem>
+                <ListItemText primary={"Ignore messages"} />
+                <ListItemSecondaryAction>
+                  <IconButton>
+                    <ReportOffIcon />
+                  </IconButton>
+                </ListItemSecondaryAction>
+              </ListItem>
 
-                            <ListItem>
-                                <ListItemText primary={"Block messages"}/>
-                                <ListItemSecondaryAction>
-                                    <IconButton>
-                                        <BlockIcon/>
-                                    </IconButton>
-                                </ListItemSecondaryAction>
-                            </ListItem>
+              <ListItem>
+                <ListItemText primary={"Block messages"} />
+                <ListItemSecondaryAction>
+                  <IconButton>
+                    <BlockIcon />
+                  </IconButton>
+                </ListItemSecondaryAction>
+              </ListItem>
 
-                            <ListItem>
-                                <ListItemText
-                                    primary={"Something's wrong"}
-                                    secondary={"Give feedback and report conversation"}
-                                />
-                                <ListItemSecondaryAction>
-                                    <IconButton>
-                                        <WarningIcon/>
-                                    </IconButton>
-                                </ListItemSecondaryAction>
-                            </ListItem>
-                        </List>
-                    </Collapse>
-                </List>
-            </SidebarContent>
-        </DrawerSidebar>
-    );
+              <ListItem>
+                <ListItemText
+                  primary={"Something's wrong"}
+                  secondary={"Give feedback and report conversation"}
+                />
+                <ListItemSecondaryAction>
+                  <IconButton>
+                    <WarningIcon />
+                  </IconButton>
+                </ListItemSecondaryAction>
+              </ListItem>
+            </List>
+          </Collapse>
+        </List>
+      </SidebarContent>
+    </DrawerSidebar>
+  );
 };
 
 export default InfoListDrawerComponent;

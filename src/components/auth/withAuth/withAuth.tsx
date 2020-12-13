@@ -1,32 +1,33 @@
 import React from "react";
-import {NextPage} from "next";
-import {useRouter} from "next/router";
-import {AuthContext} from "@src/context/messenger/auth";
+import { NextPage } from "next";
+import useAuth from "@hooks/useAuth";
+import { useRouter } from "next/router";
 
-export const withAuth = <T extends {}>(WrappedComponent: React.FC<T> | NextPage<T>) => {
-    const Wrapper: React.FC<T> = props => {
-        const router = useRouter()
-        const authContext = React.useContext(AuthContext)
-        const [render, setRender] = React.useState(false)
+export const withAuth = <T extends {}>(
+  WrappedComponent: React.FC<T> | NextPage<T>
+) => {
+  const Wrapper: React.FC<T> = (props) => {
+    const auth = useAuth();
+    const router = useRouter();
+    const [render, setRender] = React.useState(false);
 
-        React.useEffect(() => {
-            if (!authContext.authenticated) {
-                router.replace({
-                    pathname: "/login",
-                    query: {
-                        next: router.pathname
-                    }
-                })
-            } else {
-                setRender(true)
-            }
+    React.useEffect(() => {
+      if (!auth.authenticated) {
+        router.replace({
+          pathname: "/login",
+          query: {
+            next: router.pathname,
+          },
+        });
+      } else {
+        setRender(true);
+      }
+    }, [auth.authenticated]);
 
-        }, [authContext.authenticated])
+    return render && <WrappedComponent {...props} />;
+  };
 
-        return render && <WrappedComponent {...props} />
-    }
-
-    return Wrapper
-}
+  return Wrapper;
+};
 
 export default withAuth;

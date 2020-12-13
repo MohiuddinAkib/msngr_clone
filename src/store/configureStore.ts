@@ -1,6 +1,6 @@
 import {useDispatch} from "react-redux";
-import firebase from "@config/firebase"
 import rootReducer from "@store/rootReducer";
+import firebase from "@src/api/firebaseClientApi"
 import {constants as rfConstants} from "redux-firestore"
 import {getFirestore, reduxFirestore} from "redux-firestore";
 import {configureStore, ThunkAction, Action} from "@reduxjs/toolkit";

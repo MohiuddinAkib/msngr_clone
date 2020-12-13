@@ -1,21 +1,18 @@
-import React from "react"
-import {NextPage} from "next";
+import React from "react";
+import { NextPage } from "next";
 import withAuth from "@components/auth/withAuth";
 import MessengerLayout from "@layouts/MessengerLayout";
 import MessagesPeopleTab from "@layouts/MessagesPeopleTab";
-import ConversationListComponent from "@containers/messenger/ConversationList";
+import ConversationListContainer from "@containers/messenger/ConversationListContainer";
 
 const Index: NextPage = (props) => {
-    return (
-        <MessengerLayout>
-            <MessagesPeopleTab>
-                <ConversationListComponent/>
-            </MessagesPeopleTab>
-        </MessengerLayout>
-    );
+  return (
+    <MessengerLayout>
+      <MessagesPeopleTab>
+        <ConversationListContainer />
+      </MessagesPeopleTab>
+    </MessengerLayout>
+  );
 };
 
 export default withAuth(Index);
-
-// export const getServerSideProps: GetServerSideProps = getServerSidePropsPrivate()
-
