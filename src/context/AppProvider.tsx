@@ -14,9 +14,11 @@ import { makeApplicationTheme } from "@src/theme/makeApplicationTheme";
 export const AppContext = React.createContext<{
   theme: Theme;
   resetErrorBoundary: Function;
-  toggleDarkMode: Function;
+  toggleDarkMode: () => void;
+  darkMode: boolean;
 }>({
   theme: null,
+  darkMode: false,
   toggleDarkMode: null,
   resetErrorBoundary: null,
 });
@@ -49,7 +51,7 @@ const AppProvider: React.FC = (props) => {
 
   return (
     <AppContext.Provider
-      value={{ resetErrorBoundary, theme: appTheme, toggleDarkMode }}
+      value={{ resetErrorBoundary, theme: appTheme, toggleDarkMode, darkMode }}
     >
       <ReactReduxContext.Consumer>
         {({ store }: { store: Store<RootState, Action<string>> }) => (

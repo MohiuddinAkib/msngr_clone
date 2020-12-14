@@ -1,23 +1,27 @@
 import React from "react";
 import useAuth from "@hooks/useAuth";
-import { useAppDispatch } from "@store/configureStore";
+import { useRouter } from "next/router";
 import { IParticipant } from "@src/models/IParticipant";
 import { IUserMessage } from "@src/models/IUserMessage";
+import * as StorageTypes from "@firebase/storage-types";
 import { IConversation } from "@src/models/IConversation";
 import { COLLECTIONS } from "@src/api/firebaseClientApi";
 import { Participant } from "@src/data/domain/Participant";
 import { Conversation } from "@src/data/domain/Conversation";
 import { Message, MessageBlock } from "@src/data/domain/Message";
-import { useFirestore, useFirestoreConnect } from "react-redux-firebase";
-import { conversationSlice } from "@store/features/conversation/conversationSlice";
+import {
+  useFirebase,
+  useFirestore,
+  useFirestoreConnect,
+} from "react-redux-firebase";
 
 export const MessengerContext = React.createContext<{
   conversations: any;
-  selectedConvId: any;
-  showProfileMenu: any;
-  hideProfileMenu: any;
-  openProfileMenu: any;
-  selectConversation: any;
+  selectedConvId: string;
+  openProfileMenu: boolean;
+  showProfileMenu: () => void;
+  hideProfileMenu: () => void;
+  selectConversation: (conversationId: string) => void;
   addConversationMessageListener: (
     conversationId: string,
     onConversationMessageSuccess: (messageBlcoks: MessageBlock[]) => void,
@@ -27,6 +31,33 @@ export const MessengerContext = React.createContext<{
     onConversationSuccess: (conversations: Conversation[]) => void,
     onConversationError: (error: Error) => void
   ) => void;
+  handleSendAudioMessage: (
+    path: string,
+    recordedBlob: Blob,
+    dbPath: string,
+    metadata: StorageTypes.UploadMetadata,
+    name: string
+  ) => Promise<{
+    uploadTaskSnapshot: StorageTypes.UploadTaskSnapshot;
+  }>;
+  handleSendVideoMessage: (
+    path: string,
+    recordedBlob: Blob,
+    dbPath: string,
+    metadata: StorageTypes.UploadMetadata,
+    name: string
+  ) => Promise<{
+    uploadTaskSnapshot: StorageTypes.UploadTaskSnapshot;
+  }>;
+  handleSendScreenshotMessage: (
+    path: string,
+    recordedBlob: Blob,
+    dbPath: string,
+    metadata: StorageTypes.UploadMetadata,
+    name: string
+  ) => Promise<{
+    uploadTaskSnapshot: StorageTypes.UploadTaskSnapshot;
+  }>;
 }>({
   conversations: null,
   selectedConvId: null,
@@ -36,13 +67,16 @@ export const MessengerContext = React.createContext<{
   selectConversation: null,
   addAuthConversationsListener: null,
   addConversationMessageListener: null,
+  handleSendAudioMessage: null,
+  handleSendVideoMessage: null,
+  handleSendScreenshotMessage: null,
 });
 
 const MessengerProvider: React.FC = (props) => {
+  const router = useRouter();
+  const firebase = useFirebase();
   const { user: auth } = useAuth();
   const firestore = useFirestore();
-  const dispatch = useAppDispatch();
-
   // Profile related starts
   const [openProfileMenu, setOpenProfileMenu] = React.useState(false);
   // Profile related ends;
@@ -83,7 +117,7 @@ const MessengerProvider: React.FC = (props) => {
           return new Conversation(snapshot.id, conversation);
         },
       })
-      // .orderBy("last_activity", "desc")
+      .orderBy("last_activity", "desc")
       .where(COLLECTIONS.participants, "array-contains", auth.uid)
       .where("deleted_at", "==", null)
       .onSnapshot((querySnapshot) => {
@@ -203,9 +237,123 @@ const MessengerProvider: React.FC = (props) => {
       }, onConversationMessageError);
   };
 
-  const selectConversation = (convId: string) => {
-    dispatch(conversationSlice.actions.selectConversation(convId));
+  const selectConversation = (conversationId: string) => {
+    setSelectedConvId(conversationId);
   };
+
+  const handleSendAudioMessage = (
+    path: string,
+    recordedBlob: Blob,
+    dbPath: string,
+    metadata: StorageTypes.UploadMetadata,
+    name: string
+  ) =>
+    firebase.uploadFile(path, recordedBlob, dbPath, {
+      metadataFactory: (uploadRes, firebase, meta, downloadURL) => {
+        const {
+          metadata: {
+            fullPath,
+            timeCreated,
+            updated,
+            contentType,
+            customMetadata,
+            size,
+            name,
+          },
+        } = uploadRes;
+        return {
+          name,
+          size,
+          fullPath,
+          downloadURL,
+          type: "file",
+          contentType,
+          customMetadata,
+          deleted_at: null,
+          updated_at: updated,
+          sender_id: auth.uid,
+          created_at: timeCreated,
+        };
+      },
+      metadata,
+      name,
+    });
+
+  const handleSendScreenshotMessage = (
+    path: string,
+    data: Blob,
+    dbPath: string,
+    metadata: StorageTypes.UploadMetadata,
+    name: string
+  ) =>
+    firebase.uploadFile(path, data, dbPath, {
+      metadataFactory: (uploadRes, firebase1, metadata, downloadURL) => {
+        const {
+          metadata: {
+            fullPath,
+            timeCreated,
+            updated,
+            contentType,
+            customMetadata,
+            size,
+            name,
+          },
+        } = uploadRes;
+        return {
+          name,
+          size,
+          fullPath,
+          downloadURL,
+          type: "file",
+          contentType,
+          customMetadata,
+          deleted_at: null,
+          updated_at: updated,
+          sender_id: auth.uid,
+          created_at: timeCreated,
+        };
+      },
+      metadata,
+      name,
+    });
+
+  const handleSendVideoMessage = (
+    path: string,
+    rcrdBlob: Blob,
+    dbPath: string,
+    metadata: StorageTypes.UploadMetadata,
+    name: string
+  ) =>
+    firebase.uploadFile(path, rcrdBlob, dbPath, {
+      metadataFactory: (uploadRes, firebase, meta, downloadURL) => {
+        const {
+          metadata: {
+            fullPath,
+            timeCreated,
+            updated,
+            contentType,
+            customMetadata,
+            size,
+            name,
+          },
+        } = uploadRes;
+        return {
+          name,
+          size,
+          fullPath,
+          downloadURL,
+          type: "file",
+          contentType,
+          customMetadata,
+          deleted_at: null,
+          updated_at: updated,
+          sender_id: auth.uid,
+          created_at: timeCreated,
+        };
+      },
+      metadata,
+      name,
+    });
 
   return (
     <MessengerContext.Provider
@@ -216,6 +364,9 @@ const MessengerProvider: React.FC = (props) => {
         showProfileMenu,
         hideProfileMenu,
         selectConversation,
+        handleSendAudioMessage,
+        handleSendVideoMessage,
+        handleSendScreenshotMessage,
         addAuthConversationsListener,
         addConversationMessageListener,
       }}

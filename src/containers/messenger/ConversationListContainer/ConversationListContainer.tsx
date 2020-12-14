@@ -20,7 +20,17 @@ const ConversationListContainer: React.FC = (props) => {
     );
   }, []);
 
-  return <ConversationListComponent conversations={conversations} />;
+  const conversationClickHandler = (conversationId) => {
+    messenger.selectConversation(conversationId);
+  };
+
+  return (
+    <ConversationListComponent
+      conversations={conversations}
+      onConversationClicked={conversationClickHandler}
+      selectedConversationId={messenger.selectedConvId}
+    />
+  );
 };
 
 export default ConversationListContainer;

@@ -1,4 +1,5 @@
 import React from "react";
+import useApp from "@hooks/useApp";
 import propTypes from "prop-types";
 import useAuth from "@hooks/useAuth";
 import Grid from "@material-ui/core/Grid";
@@ -61,7 +62,8 @@ const Transition = React.forwardRef(function Transition(
   return <Slide direction="up" ref={ref} {...props} />;
 });
 
-const ListDrawerHeaderComponent: React.FC<Props> = (props) => {
+const ConversationListDrawerHeaderComponent: React.FC<Props> = (props) => {
+  const app = useApp();
   const auth = useAuth();
   const theme = useTheme();
   const classes = useStyles();
@@ -137,16 +139,16 @@ const ListDrawerHeaderComponent: React.FC<Props> = (props) => {
             src={"https://picsum.photos/200/300?grayscale&random=2"}
           />
 
-          {!isLoaded(messenger.profileLoading) ? (
+          {auth.profileLoading ? (
             <Skeleton variant="text" />
           ) : (
             <Typography variant={"h4"} align={"center"}>
-              {messenger.profile.first_name} {messenger.profile.last_name}
+              {auth.profile.first_name} {auth.profile.last_name}
             </Typography>
           )}
 
           <List>
-            <ListItem button onClick={messenger.toggleDarkMode}>
+            <ListItem button onClick={app.toggleDarkMode}>
               <ListItemIcon>
                 <NightsStayIcon />
               </ListItemIcon>
@@ -154,8 +156,8 @@ const ListDrawerHeaderComponent: React.FC<Props> = (props) => {
               <ListItemSecondaryAction>
                 <Switch
                   color="default"
-                  checked={messenger.darkMode}
-                  onChange={messenger.toggleDarkMode}
+                  checked={app.darkMode}
+                  onChange={app.toggleDarkMode}
                 />
               </ListItemSecondaryAction>
             </ListItem>
@@ -191,8 +193,8 @@ const ListDrawerHeaderComponent: React.FC<Props> = (props) => {
   );
 };
 
-ListDrawerHeaderComponent.propTypes = {
+ConversationListDrawerHeaderComponent.propTypes = {
   trigger: propTypes.bool.isRequired,
 };
 
-export default ListDrawerHeaderComponent;
+export default ConversationListDrawerHeaderComponent;

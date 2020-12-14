@@ -19,7 +19,7 @@ const MessageListContainer = () => {
         console.log(error);
       }
     );
-  }, []);
+  }, [router.query.conversation_uid]);
 
   return <MessageListComponent messageBlocks={messageBlocks} />;
 };

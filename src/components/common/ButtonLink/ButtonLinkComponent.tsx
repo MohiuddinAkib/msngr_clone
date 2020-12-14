@@ -13,7 +13,7 @@ const ButtonLinkComponent = React.forwardRef<
   HTMLAnchorElement,
   PropsWithChildren<Props & LinkProps & MUILinkProps & TypographyProps>
 >(({ className, href, as, children, prefetch, ...rest }, ref) => (
-  <Link href={href} as={as} prefetch={prefetch}>
+  <Link href={href} as={as} prefetch={prefetch} passHref>
     <MUILink className={className} {...rest}>
       {children}
     </MUILink>

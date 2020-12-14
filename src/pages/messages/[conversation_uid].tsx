@@ -4,7 +4,7 @@ import withAuth from "@components/auth/withAuth";
 import MessengerLayout from "@layouts/MessengerLayout";
 import HeaderComponent from "@components/messenger/header/main/Header";
 import InfoListDrawerComponent from "@components/messenger/InfoListDrawer";
-import ListDrawerComponent from "@components/messenger/convesation/ListDrawer";
+import ListDrawerComponent from "@components/messenger/convesation/ConversationListDrawer";
 import LayoutContentComponent from "@components/messenger/content/LayoutContent";
 import MessageListContainer from "@containers/messenger/MessageListContainer/MessageListContainer";
 

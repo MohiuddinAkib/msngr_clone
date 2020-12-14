@@ -3,13 +3,14 @@ import styled from "styled-components";
 import { getDrawerSidebar } from "@mui-treasury/layout";
 import { createStyles, makeStyles } from "@material-ui/core/styles";
 import ConversationListContainer from "@containers/messenger/ConversationListContainer";
-import ListDrawerHeaderComponent from "@components/messenger/convesation/ListDrawerHeader";
+import ListDrawerHeaderComponent from "@components/messenger/convesation/ConversationListDrawerHeader";
 
 const DrawerSidebar = getDrawerSidebar(styled);
 
 const useStyles = makeStyles((theme) =>
   createStyles({
     drawerPaperRoot: {
+      overflowY: "hidden",
       [theme.breakpoints.up("lg")]: {
         maxWidth: 420,
       },
@@ -26,7 +27,7 @@ const useStyles = makeStyles((theme) =>
   })
 );
 
-const ListDrawerComponent: React.FC = (props) => {
+const ConversationListDrawerComponent: React.FC = (props) => {
   const classes = useStyles();
   const [trigger, setTrigger] = React.useState(false);
 
@@ -52,4 +53,4 @@ const ListDrawerComponent: React.FC = (props) => {
   );
 };
 
-export default ListDrawerComponent;
+export default ConversationListDrawerComponent;
