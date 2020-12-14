@@ -8,6 +8,7 @@ import AppProvider from "@src/context/AppProvider";
 import { StylesProvider } from "@material-ui/styles";
 import CssBaseline from "@material-ui/core/CssBaseline";
 import "@webscopeio/react-textarea-autocomplete/style.css";
+import "@sandstreamdev/react-swipeable-list/dist/styles.css";
 
 const MyApp: React.FC<AppProps> = (props) => {
   const { Component, pageProps } = props;
@@ -25,7 +26,7 @@ const MyApp: React.FC<AppProps> = (props) => {
       <Head>
         <meta
           name="viewport"
-          content="minimum-scale=1, initial-scale=1, width=device-width"
+          content="minimum-scale=1, initial-scale=1, width=device-width, shrink-to-fit=no"
         />
       </Head>
       <CssBaseline />

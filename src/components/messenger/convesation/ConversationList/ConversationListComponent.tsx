@@ -9,6 +9,11 @@ import { Conversation } from "@src/data/domain/Conversation";
 import InputAdornment from "@material-ui/core/InputAdornment";
 import { createStyles, makeStyles } from "@material-ui/core/styles";
 import ConversationItemComponent from "@components/messenger/convesation/ConversationItem";
+import {
+  SwipeableList,
+  ISwipeableListProps,
+  ISwipeableListItemProps,
+} from "@sandstreamdev/react-swipeable-list";
 
 const useStyles = makeStyles((theme) =>
   createStyles({
@@ -27,7 +32,7 @@ const useStyles = makeStyles((theme) =>
   })
 );
 
-interface IProps {
+interface IProps extends ISwipeableListProps, ISwipeableListItemProps {
   conversations: Conversation[];
   selectedConversationId: string;
   onConversationClicked: (conversationId: string) => void;
@@ -38,11 +43,20 @@ const ConversationListComponent: React.FC<IProps> = (props) => {
 
   const items = React.useMemo(
     () =>
-      props.conversations.map((conversation) => {
+      props.conversations.map((conversation, i) => {
         return (
           <ConversationItemComponent
             key={conversation.id}
             conversation={conversation}
+            threshold={props.threshold}
+            swipeLeft={props.swipeLeft}
+            swipeRight={props.swipeRight}
+            onSwipeEnd={props.onSwipeEnd}
+            blockSwipe={props.blockSwipe}
+            onSwipeStart={props.onSwipeStart}
+            onSwipeProgress={props.onSwipeProgress}
+            swipeStartThreshold={props.swipeStartThreshold}
+            scrollStartThreshold={props.scrollStartThreshold}
             onConversationClicked={props.onConversationClicked}
             selected={conversation.id === props.selectedConversationId}
           />
@@ -86,7 +100,13 @@ const ConversationListComponent: React.FC<IProps> = (props) => {
           height: "100%",
         }}
       >
-        {items}
+        <SwipeableList
+          threshold={props.threshold}
+          scrollStartThreshold={props.swipeStartThreshold}
+          swipeStartThreshold={props.scrollStartThreshold}
+        >
+          {items}
+        </SwipeableList>
       </Scrollbars>
     </List>
   );
