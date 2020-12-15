@@ -1,5 +1,6 @@
 import React from "react";
 import Link from "next/link";
+import Peer from "simple-peer";
 import { NextPage } from "next";
 import Box from "@material-ui/core/Box";
 import Grid from "@material-ui/core/Grid";
@@ -40,9 +41,6 @@ const App: NextPage = () => {
   const [peerConnection, setPeerConnection] = React.useState<RTCPeerConnection>(
     null
   );
-  const [callerOrCallee, setCallerOrCallee] = React.useState<
-    "caller" | "callee"
-  >("");
   const [disableJoinBtn, setDisableJoinBtn] = React.useState(true);
   const [disableCreateBtn, setDisableCreateBtn] = React.useState(true);
   const [disableHangUpBtn, setDisableHangUpBtn] = React.useState(true);
@@ -75,27 +73,13 @@ const App: NextPage = () => {
     setCallerCandidatesSubscription,
   ] = React.useState<() => void>(null);
 
-  const configuration = React.useMemo(() => {
-    return {
-      iceServers: [
-        {
-          urls: [
-            "stun:stun1.l.google.com:19302",
-            "stun:stun2.l.google.com:19302",
-          ],
-        },
-      ],
-      iceCandidatePoolSize: 10,
-    };
-  }, []);
-
   React.useEffect(() => {
     if (localVideo.current) {
       localVideo.current.srcObject = localStream;
     }
 
     if (remoteVideo.current) {
-      remoteVideo.current.srcObject = remoteStream;
+      // remoteVideo.current.srcObject = remoteStream;
     }
   }, [localVideo, remoteVideo, localStream, remoteStream]);
 
@@ -119,182 +103,61 @@ const App: NextPage = () => {
     callerCandidatesSubscription,
   ]);
 
-  React.useEffect(() => {
-    if (peerConnection) {
-      peerConnection.addEventListener(
-        "icegatheringstatechange",
-        handleicegatheringstatechange
-      );
-
-      peerConnection.addEventListener(
-        "connectionstatechange",
-        handleconnectionstatechange
-      );
-
-      peerConnection.addEventListener(
-        "signalingstatechange",
-        handlesignalingstatechange
-      );
-
-      peerConnection.addEventListener(
-        "iceconnectionstatechange ",
-        handleiceconnectionstatechange
-      );
-
-      localStream.getTracks().forEach((track) => {
-        peerConnection.addTrack(track, localStream);
-      });
-
-      // Code for collecting ICE candidates below
-      peerConnection.addEventListener("icecandidate", handleicecandidatecaller);
-      peerConnection.addEventListener("icecandidate", handleicecandidatecallee);
-
-      // Code for collecting ICE candidates above
-    }
-
-    return () => {
-      if (peerConnection) {
-        peerConnection.removeEventListener(
-          "icegatheringstatechange",
-          handleicegatheringstatechange
-        );
-        peerConnection.removeEventListener(
-          "connectionstatechange",
-          handleconnectionstatechange
-        );
-        peerConnection.removeEventListener(
-          "signalingstatechange",
-          handlesignalingstatechange
-        );
-        peerConnection.removeEventListener(
-          "iceconnectionstatechange",
-          handleiceconnectionstatechange
-        );
-        peerConnection.removeEventListener(
-          "icecandidate",
-          handleicecandidatecaller
-        );
-        peerConnection.removeEventListener(
-          "icecandidate",
-          handleicecandidatecallee
-        );
-
-        peerConnection.removeEventListener("track", handletrack);
-      }
-    };
-  }, [peerConnection]);
-
-  function handleicegatheringstatechange() {
-    console.log(
-      `ICE gathering state changed: ${peerConnection.iceGatheringState}`
-    );
-  }
-
-  function handleconnectionstatechange() {
-    console.log(`Connection state change: ${peerConnection.connectionState}`);
-  }
-
-  function handlesignalingstatechange() {
-    console.log(`Signaling state change: ${peerConnection.signalingState}`);
-  }
-
-  function handleiceconnectionstatechange() {
-    console.log(
-      `ICE connection state change: ${peerConnection.iceConnectionState}`
-    );
-  }
-
-  function handleicecandidatecallee(event: RTCPeerConnectionIceEvent) {
-    if (!event.candidate) {
-      console.log("Got final candidate!");
-      return;
-    }
-    const calleeCandidatesCollection = roomRef.collection("calleeCandidates");
-    console.log("Got candidate: ", event.candidate);
-    calleeCandidatesCollection.add(event.candidate.toJSON());
-  }
-
-  function handleicecandidatecaller(event: RTCPeerConnectionIceEvent) {
-    const callerCandidatesCollection = roomRef.collection("callerCandidates");
-
-    if (!event.candidate) {
-      console.log("Got final candidate!");
-      return;
-    }
-    console.log("Got candidate: ", event.candidate);
-    callerCandidatesCollection.add(event.candidate.toJSON());
-  }
-
-  function handletrack(event: RTCTrackEvent) {
-    console.log("Got remote track:", event.streams[0]);
-    event.streams[0].getTracks().forEach((track) => {
-      console.log("Add a track to the remoteStream:", track);
-      remoteStream.addTrack(track);
-    });
-  }
-
-  React.useEffect(() => {
-    if (roomRef) {
-    }
-  }, [roomRef]);
-
   const createRoom = async () => {
     setDisableJoinBtn(true);
     setDisableCreateBtn(true);
     const roomRef = await firestore.collection("rooms").doc();
     setRoomRef(roomRef);
-    console.log("Create PeerConnection with configuration: ", configuration);
-    const peerConnection = new RTCPeerConnection(configuration);
-    setPeerConnection(peerConnection);
 
-    // Code for creating a room below
-    const offer = await peerConnection.createOffer();
-    await peerConnection.setLocalDescription(offer);
-    console.log("Created offer:", offer);
+    const peer = new Peer({
+      trickle: false,
+      initiator: true,
+      stream: localStream,
+    });
 
-    const roomWithOffer = {
-      offer: {
-        type: offer.type,
-        sdp: offer.sdp,
-      },
-    };
-    await roomRef.set(roomWithOffer);
-    setRoomId(roomRef.id);
-    setCallerOrCallee("caller");
-    console.log(`New room created with SDP offer. Room ID: ${roomRef.id}`);
-    alert(`Current room is ${roomRef.id} - You are the caller!`);
-    // Code for creating a room above
+    const callerCandidatesCollection = roomRef.collection("callerCandidates");
 
-    peerConnection.addEventListener("track", handletrack);
-
-    // Listening for remote session description below
-    const roomRefSubscription = roomRef.onSnapshot(async (snapshot) => {
-      const data = snapshot.data();
-      if (!peerConnection.currentRemoteDescription && data && data.answer) {
-        console.log("Got remote description: ", data.answer);
-        const rtcSessionDescription = new RTCSessionDescription(data.answer);
-        await peerConnection.setRemoteDescription(rtcSessionDescription);
+    peer.on("signal", async (data) => {
+      console.log(data);
+      if (data) {
+        if (data.type === "offer") {
+          await roomRef.set({ offer: data });
+          console.log(
+            `New room created with SDP offer. Room ID: ${roomRef.id}`
+          );
+        } else if (data.type === "candidate") {
+          callerCandidatesCollection.add(data.candidate);
+        }
       }
     });
-    setRoomRefSubscription(roomRefSubscription);
+
+    // Listening for remote session description below
+    roomRef.onSnapshot(async (snapshot) => {
+      const data = snapshot.data();
+      console.log("roomref snapshot on caller side", data);
+      if (data && data.answer) {
+        console.log("Got remote description: ", data.answer);
+        peer.signal(data.answer);
+      }
+    });
     // Listening for remote session description above
 
     // Listen for remote ICE candidates below
-    const calleeCandidatesSubscription = roomRef
-      .collection("calleeCandidates")
-      .onSnapshot((snapshot) => {
-        snapshot.docChanges().forEach(async (change) => {
-          if (change.type === "added") {
-            let data = change.doc.data();
-            console.log(
-              `Got new remote ICE candidate: ${JSON.stringify(data)}`
-            );
-            await peerConnection.addIceCandidate(new RTCIceCandidate(data));
-          }
-        });
+    roomRef.collection("calleeCandidates").onSnapshot((snapshot) => {
+      snapshot.docChanges().forEach(async (change) => {
+        if (change.type === "added") {
+          let data = change.doc.data();
+          console.log(`Got new remote ICE candidate: ${JSON.stringify(data)}`);
+          peer.signal(data);
+        }
       });
-    setCalleeCandidatesSubscription(calleeCandidatesSubscription);
+    });
     // Listen for remote ICE candidates above
+
+    peer.on("stream", (stream) => {
+      console.log("callee stream", stream, remoteVideo);
+      remoteVideo.current.srcObject = stream;
+    });
   };
 
   function joinRoom() {
@@ -303,15 +166,11 @@ const App: NextPage = () => {
     setShowRoomIdModal(true);
   }
 
-  React.useEffect(() => {
-    if (roomId && callerOrCallee === "callee") {
-      (async () => {
-        console.log("Join room: ", roomId);
-        console.log(`Current room is ${roomId} - You are the callee!`);
-        await joinRoomById(roomId);
-      })();
-    }
-  }, [roomId]);
+  // React.useEffect(() => {
+  //   if (!!roomId) {
+  //     joinRoomById(roomId);
+  //   }
+  // }, [roomId]);
 
   async function joinRoomById(roomId) {
     const roomRef = firestore.collection("rooms").doc(`${roomId}`);
@@ -319,34 +178,36 @@ const App: NextPage = () => {
     console.log("Got room:", roomSnapshot.exists);
 
     if (roomSnapshot.exists) {
-      console.log("Create PeerConnection with configuration: ", configuration);
-      const peerConnection = new RTCPeerConnection(configuration);
-      setPeerConnection(peerConnection);
+      const peer = new Peer({
+        trickle: false,
+        initiator: false,
+        stream: localStream,
+      });
 
-      // Code for collecting ICE candidates below
-      peerConnection.addEventListener("icecandidate", handleicecandidatecallee);
-      // Code for collecting ICE candidates above
+      const calleeCandidatesCollection = roomRef.collection("calleeCandidates");
 
-      peerConnection.addEventListener("track", handletrack);
+      peer.on("signal", async (data) => {
+        console.log(data);
 
-      // Code for creating SDP answer below
+        if (data) {
+          if (data.type === "answer") {
+            await roomRef.update({ answer: data });
+            console.log(`Room updated with SDP answer. Room ID: ${roomRef.id}`);
+          } else if (data.type === "candidate") {
+            calleeCandidatesCollection.add(data.candidate);
+          }
+        }
+      });
+
+      peer.on("stream", (stream) => {
+        console.log("caller stream", stream, remoteVideo);
+
+        remoteVideo.current.srcObject = stream;
+      });
+
       const offer = roomSnapshot.data().offer;
       console.log("Got offer:", offer);
-      await peerConnection.setRemoteDescription(
-        new RTCSessionDescription(offer)
-      );
-      const answer = await peerConnection.createAnswer();
-      console.log("Created answer:", answer);
-      await peerConnection.setLocalDescription(answer);
-
-      const roomWithAnswer = {
-        answer: {
-          type: answer.type,
-          sdp: answer.sdp,
-        },
-      };
-      await roomRef.update(roomWithAnswer);
-      // Code for creating SDP answer above
+      peer.signal(offer);
 
       // Listening for remote ICE candidates below
       const callerCandidatesSubscription = roomRef
@@ -358,7 +219,7 @@ const App: NextPage = () => {
               console.log(
                 `Got new remote ICE candidate: ${JSON.stringify(data)}`
               );
-              await peerConnection.addIceCandidate(new RTCIceCandidate(data));
+              peer.signal(data);
             }
           });
         });
@@ -540,9 +401,8 @@ const App: NextPage = () => {
                 e.preventDefault();
 
                 setShowRoomIdModal(false);
-                setRoomId(e.target["room-id"].value);
-                setCallerOrCallee("callee");
-                e.target.reset();
+                // setRoomId(e.target["room-id"].value);
+                joinRoomById(e.target["room-id"].value);
               }}
             >
               <TextField
