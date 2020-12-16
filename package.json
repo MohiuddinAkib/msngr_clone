@@ -55,7 +55,6 @@
     "@types/react-mic": "^12.4.2",
     "@types/react-redux": "^7.1.9",
     "@types/react-resize-detector": "^5.0.0",
-    "@types/react-webcam": "^3.0.0",
     "file-loader": "^6.2.0",
     "resize-observer-polyfill": "^1.5.1",
     "typescript": "^3.9.6",

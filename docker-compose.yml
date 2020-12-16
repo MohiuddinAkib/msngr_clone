@@ -1,0 +1,16 @@
+version: "3"
+
+services:
+  nextjs:
+    container_name: msngr_clone
+    ports:
+      - 3000:3000
+    build:
+      context: .
+      dockerfile: Dockerfile
+    volumes:
+      - .:/usr/src/app
+      - /usr/src/app/node_modules
+      - /usr/src/app/.next
+    env_file:
+      - .env.local
