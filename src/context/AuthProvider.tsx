@@ -1,11 +1,12 @@
 import React from "react";
-import Cookies from "universal-cookie";
+import moment from "moment";
 import { useRouter } from "next/router";
 import { useSelector } from "react-redux";
 import { IProfile } from "@src/models/IProfile";
 import { RootState } from "@store/configureStore";
 import * as AuthTypes from "@firebase/auth-types";
 import { useErrorHandler } from "react-error-boundary";
+import { IUserPresence } from "@src/models/IUserPresence";
 import AuthIsLoadedComponent from "@components/auth/AuthIsLoaded";
 import {
   isEmpty,
@@ -36,6 +37,8 @@ export const AuthContext = React.createContext<{
   handleLogout: Function;
   handleLogin: Function;
   handleRegister: Function;
+  presence: Record<string, IUserPresence>;
+  presenceLoaded: boolean;
 }>({
   user: null,
   profile: null,
@@ -46,21 +49,111 @@ export const AuthContext = React.createContext<{
   handleLogout: () => null,
   handleLogin: (values: typeof initialLoginValues) => null,
   handleRegister: (values: typeof initialRegisterValues) => null,
+  presence: null,
+  presenceLoaded: null,
 });
 
 const AuthProvider: React.FC = (props) => {
   const router = useRouter();
-  const cookies = new Cookies();
   const firebase = useFirebase();
   const handleError = useErrorHandler();
   const auth = useSelector<RootState, FirebaseReducer.AuthState>(
     (state) => state.firebase.auth
+  );
+  const presence = useSelector<RootState, Record<string, IUserPresence>>(
+    (state) => state.firebase.data.presence
   );
   // Profile related starts
   const profile = useSelector<RootState, FirebaseReducer.Profile<IProfile>>(
     (state) => state.firebase.profile
   );
   // Profile related ends;
+
+  function userStatusAwayOnDocumentVisibilityHanler(e) {
+    firebase
+      .database()
+      .ref(`presence/${auth.uid}`)
+      .once("value", (snapshot) => {
+        if (document.visibilityState === "hidden") {
+          if (snapshot.exists()) {
+            snapshot.ref.update({
+              state: "away",
+              last_changed: moment().toISOString(),
+            });
+          } else {
+            snapshot.ref.push({
+              state: "away",
+              last_changed: moment().toISOString(),
+            });
+          }
+        } else {
+          if (snapshot.exists()) {
+            snapshot.ref.update({
+              state: "online",
+              last_changed: moment().toISOString(),
+            });
+          } else {
+            snapshot.ref.push({
+              state: "online",
+              last_changed: moment().toISOString(),
+            });
+          }
+        }
+      });
+  }
+
+  React.useEffect(() => {
+    const authLoaded = isLoaded(auth) && !isEmpty(auth);
+    if (authLoaded) {
+      document.addEventListener(
+        "visibilitychange",
+        userStatusAwayOnDocumentVisibilityHanler
+      );
+
+      // Monitor connection state on browser tab
+      firebase
+        .database()
+        .ref(".info/connected")
+        .on("value", function (snap) {
+          if (snap.val()) {
+            firebase
+              .database()
+              .ref(`presence/${auth.uid}`)
+              .once("value", (snapshot) => {
+                if (snapshot.exists()) {
+                  snapshot.ref.update({
+                    state: "online",
+                    last_changed: moment().toISOString(),
+                  });
+
+                  // if we lose network then remove this user from the list
+                  snapshot.ref.onDisconnect().update({
+                    state: "offline",
+                    last_changed: moment().toISOString(),
+                  });
+                } else {
+                  snapshot.ref.push({
+                    state: "online",
+                    last_changed: moment().toISOString(),
+                  });
+                }
+              });
+          } else {
+            // client has lost network
+            console.log("offline");
+          }
+        });
+    }
+
+    return () => {
+      if (authLoaded) {
+        document.removeEventListener(
+          "visibilitychange",
+          userStatusAwayOnDocumentVisibilityHanler
+        );
+      }
+    };
+  }, [auth]);
 
   const handleLogin = async (values: typeof initialLoginValues) => {
     try {
@@ -84,6 +177,11 @@ const AuthProvider: React.FC = (props) => {
 
   const handleLogout = async () => {
     try {
+      await firebase.database().ref("presence").child(auth.uid).update({
+        state: "offline",
+        last_changed: moment().toISOString(),
+      });
+
       await firebase.logout();
 
       router.replace({
@@ -93,17 +191,6 @@ const AuthProvider: React.FC = (props) => {
       handleError(error);
     }
   };
-
-  React.useEffect(() => {
-    return firebase.auth().onIdTokenChanged(async (user) => {
-      if (user) {
-        const token = await user.getIdToken();
-        cookies.set("auth", token);
-      } else {
-        cookies.remove("auth");
-      }
-    });
-  }, []);
 
   return (
     <AuthIsLoadedComponent>
@@ -118,6 +205,8 @@ const AuthProvider: React.FC = (props) => {
           initialRegisterValues,
           profileLoading: !isLoaded(profile),
           authenticated: !isEmpty(auth) && isLoaded(auth),
+          presence,
+          presenceLoaded: isLoaded(presence) && !isEmpty(presence),
         }}
       >
         {props.children}

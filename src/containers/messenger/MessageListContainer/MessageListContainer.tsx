@@ -1,14 +1,17 @@
 import React from "react";
+import useAuth from "@hooks/useAuth";
 import { useRouter } from "next/router";
 import Fab from "@material-ui/core/Fab";
 import Box from "@material-ui/core/Box";
+import Badge from "@material-ui/core/Badge";
+import usePrevious from "@hooks/usePrevious";
 import useMessenger from "@hooks/useMessenger";
 import { MessageBlock } from "@src/data/domain/Message";
+import { IUserPresence } from "@src/models/IUserPresence";
+import useOtherParticipant from "@hooks/useOtherParticipant";
 import { makeStyles, createStyles } from "@material-ui/core/styles";
 import KeyboardArrowDownIcon from "@material-ui/icons/KeyboardArrowDown";
 import MessageListComponent from "@src/components/MessageList/MessageListComponent";
-import usePrevious from "@hooks/usePrevious";
-import Badge from "@material-ui/core/Badge";
 
 const useStyles = makeStyles((theme) =>
   createStyles({
@@ -22,6 +25,7 @@ const useStyles = makeStyles((theme) =>
 );
 
 const MessageListContainer = () => {
+  const auth = useAuth();
   const router = useRouter();
   const classes = useStyles();
   const messenger = useMessenger();
@@ -34,11 +38,25 @@ const MessageListContainer = () => {
   const prevMessageBlocksMessagesCount = React.useRef(
     prevMessageBlocks?.length || 0
   );
+  const { otherParticipant, otherParticipantLoaded } = useOtherParticipant(
+    router.query.conversation_uid as string
+  );
+  const [
+    otherParticipantPresence,
+    setOtherParticipantPresence,
+  ] = React.useState<IUserPresence>(null);
 
   // React.useEffect(() => {
   //   console.log(scroller.current);
   //   scroller.current.scrollIntoView({ behavior: "smooth" });
   // }, []);
+
+  React.useEffect(() => {
+    if (otherParticipantLoaded) {
+      const presence = auth.getUserPresence(otherParticipant.id);
+      setOtherParticipantPresence(presence);
+    }
+  }, [otherParticipant, otherParticipantLoaded]);
 
   React.useEffect(() => {
     return messenger.addConversationMessageListener(

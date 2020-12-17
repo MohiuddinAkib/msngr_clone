@@ -1,24 +1,28 @@
 import React from "react";
+import moment from "moment";
 import useAuth from "@hooks/useAuth";
 import { useRouter } from "next/router";
+import { useSelector } from "react-redux";
 import IGif from "@giphy/js-types/dist/gif";
 import { isServer } from "@src/api/platformApi";
+import { RootState } from "@store/configureStore";
 import { IParticipant } from "@src/models/IParticipant";
 import { IUserMessage } from "@src/models/IUserMessage";
 import * as StorageTypes from "@firebase/storage-types";
-import { IConversation } from "@src/models/IConversation";
 import { COLLECTIONS } from "@src/api/firebaseClientApi";
+import { IConversation } from "@src/models/IConversation";
+import { IUserPresence } from "@src/models/IUserPresence";
 import { Participant } from "@src/data/domain/Participant";
 import { Conversation } from "@src/data/domain/Conversation";
 import { Message, MessageBlock } from "@src/data/domain/Message";
 import {
   useFirebase,
   useFirestore,
+  useFirebaseConnect,
   useFirestoreConnect,
 } from "react-redux-firebase";
 
 export const MessengerContext = React.createContext<{
-  conversations: any;
   selectedConvId: string;
   openProfileMenu: boolean;
   showProfileMenu: () => void;
@@ -64,8 +68,8 @@ export const MessengerContext = React.createContext<{
   handleSendTextMsg: (conversationId: string, text: string) => Promise<any>;
   updateConversationActivity: (conversationDocId: string) => Promise<void>;
   getSelectedConversationIdOrFetchFromDb: () => Promise<string>;
+  getConversationById: (conversationId: string) => Promise<Conversation>;
 }>({
-  conversations: null,
   selectedConvId: null,
   showProfileMenu: null,
   hideProfileMenu: null,
@@ -80,6 +84,7 @@ export const MessengerContext = React.createContext<{
   handleSendTextMsg: null,
   updateConversationActivity: null,
   getSelectedConversationIdOrFetchFromDb: null,
+  getConversationById: null,
 });
 
 const MessengerProvider: React.FC = (props) => {
@@ -87,6 +92,7 @@ const MessengerProvider: React.FC = (props) => {
   const firebase = useFirebase();
   const { user: auth } = useAuth();
   const firestore = useFirestore();
+
   // Profile related starts
   const [openProfileMenu, setOpenProfileMenu] = React.useState(false);
   // Profile related ends;
@@ -99,14 +105,23 @@ const MessengerProvider: React.FC = (props) => {
     return convIdFromStorage || (router.query.conversation_uid as string) || "";
   });
 
-  const [conversations, setConversations] = React.useState<{
-    [key: string]: IConversation;
-  }>({});
   // Conversations related ends
 
-  useFirestoreConnect({
-    collection: COLLECTIONS.users,
-  });
+  useFirestoreConnect([
+    {
+      collection: COLLECTIONS.users,
+    },
+    // {
+    //   collection: COLLECTIONS.conversations,
+    //   orderBy: ["last_activity", "desc"],
+    //   where: [
+    //     [COLLECTIONS.participants, "array-contains", auth.uid],
+    //     ["deleted_at", "==", null],
+    //   ],
+    // },
+  ]);
+
+  useFirebaseConnect("presence");
 
   const showProfileMenu = () => {
     setOpenProfileMenu(true);
@@ -201,6 +216,29 @@ const MessengerProvider: React.FC = (props) => {
         onConversationSuccess(conversations);
       }, onConversationError);
 
+  const getConversationById = async (conversationId: string) => {
+    try {
+      const snapshot = await firestore
+        .collection(`${COLLECTIONS.conversations}`)
+        .doc(conversationId)
+        .withConverter({
+          toFirestore: function (conversation: Conversation) {
+            return conversation.raw;
+          },
+          fromFirestore: function (snapshot, options) {
+            const conversation = snapshot.data(options) as IConversation;
+
+            return new Conversation(snapshot.id, conversation);
+          },
+        })
+        .get();
+
+      return snapshot.data();
+    } catch (e) {
+      return e;
+    }
+  };
+
   const addConversationMessageListener = (
     conversationId: string,
     onConversationMessageSuccess: (messageBlcoks: MessageBlock[]) => void,
@@ -264,7 +302,7 @@ const MessengerProvider: React.FC = (props) => {
       const querySnapshot = await firestore
         .collection(COLLECTIONS.conversations)
         .where("deleted_at", "==", null)
-        // .orderBy("last_activity", "desc")
+        .orderBy("last_activity", "desc")
         .limit(1)
         .get();
 
@@ -421,7 +459,6 @@ const MessengerProvider: React.FC = (props) => {
   return (
     <MessengerContext.Provider
       value={{
-        conversations,
         selectedConvId,
         openProfileMenu,
         showProfileMenu,
@@ -436,6 +473,7 @@ const MessengerProvider: React.FC = (props) => {
         handleSendTextMsg,
         updateConversationActivity,
         getSelectedConversationIdOrFetchFromDb,
+        getConversationById,
       }}
     >
       {props.children}

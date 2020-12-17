@@ -1,7 +1,8 @@
 import * as firebase from "firebase/app"
 import "firebase/auth"
-import "firebase/firestore"
+import "firebase/database"
 import "firebase/storage"
+import "firebase/firestore"
 
 export const fbConfig = {
     apiKey: "AIzaSyC3Gp6gY_yOqH02TpAjbitK4JXgV5Raw-4",
@@ -18,6 +19,7 @@ export default !firebase.apps.length ? firebase.initializeApp(fbConfig) : fireba
 firebase.auth()
 firebase.firestore()
 firebase.storage()
+firebase.database()
 
 export const COLLECTIONS = {
     conversations: "conversations",

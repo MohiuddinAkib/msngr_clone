@@ -1,4 +1,5 @@
 import React from "react";
+import useAuth from "@hooks/useAuth";
 import styled from "styled-components";
 import List from "@material-ui/core/List";
 import Avatar from "@material-ui/core/Avatar";
@@ -54,6 +55,7 @@ const useStyles = makeStyles((theme) =>
 );
 
 const InfoListDrawerComponent: React.FC = (props) => {
+  const auth = useAuth();
   const theme = useTheme();
   const classes = useStyles();
   const [showMoreActions, setShowMoreActions] = React.useState(false);

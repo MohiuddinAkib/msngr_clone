@@ -1,6 +1,8 @@
 import React from "react";
 import Link from "next/link";
+import useAuth from "@hooks/useAuth";
 import Box from "@material-ui/core/Box";
+import Badge from "@material-ui/core/Badge";
 import Avatar from "@material-ui/core/Avatar";
 import Skeleton from "@material-ui/lab/Skeleton";
 import ListItem from "@material-ui/core/ListItem";
@@ -8,8 +10,9 @@ import { Message } from "@src/data/domain/Message";
 import IconButton from "@material-ui/core/IconButton";
 import Typography from "@material-ui/core/Typography";
 import MoreHorizIcon from "@material-ui/icons/MoreHoriz";
+import { IUserPresence } from "@src/models/IUserPresence";
 import ListItemText from "@material-ui/core/ListItemText";
-import { Participant } from "@src/data/domain/Participant";
+import useOtherParticipant from "@hooks/useOtherParticipant";
 import { Conversation } from "@src/data/domain/Conversation";
 import ListItemAvatar from "@material-ui/core/ListItemAvatar";
 import { createStyles, makeStyles } from "@material-ui/core/styles";
@@ -18,6 +21,8 @@ import {
   ISwipeableListItemProps,
 } from "@sandstreamdev/react-swipeable-list";
 import ListItemSecondaryAction from "@material-ui/core/ListItemSecondaryAction";
+import { useSelector } from "react-redux";
+import { RootState } from "@store/configureStore";
 
 const useStyles = makeStyles((theme) =>
   createStyles({
@@ -37,26 +42,32 @@ interface IProps extends ISwipeableListItemProps {
 }
 
 const ConversationItemComponent: React.FC<IProps> = (props) => {
+  const auth = useAuth();
   const classes = useStyles();
+
   const [blockSwipe, setBlockSwipe] = React.useState(false);
   const [lastMsg, setLastMsg] = React.useState<Message>(null);
-  const [otherParticipant, setOtherParticipant] = React.useState<Participant>(
-    null
+
+  const { otherParticipant, otherParticipantLoaded } = useOtherParticipant(
+    props.conversation
   );
-  const [otherParticipantLoaded, setOtherParticipantLoaded] = React.useState(
-    false
-  );
+  const [
+    otherParticipantPresence,
+    setOtherParticipantPresence,
+  ] = React.useState<IUserPresence>(null);
 
   React.useEffect(() => {
-    props.conversation.getParticipantsData((participants) => {
-      const [otherPerson] = participants.filter(
-        (participant) => !participant.isMe
-      );
+    if (otherParticipantLoaded && auth.presenceLoaded) {
+      const presence = auth.presence[otherParticipant.id];
+      setOtherParticipantPresence(presence);
+    }
+  }, [otherParticipant, otherParticipantLoaded, auth.presence]);
 
-      setOtherParticipant(otherPerson);
-      setOtherParticipantLoaded(true);
-    });
+  React.useEffect(() => {
+    console.log("presence in conv item", otherParticipantPresence);
+  }, [otherParticipantPresence]);
 
+  React.useEffect(() => {
     props.conversation.addLastMessageListener(
       (msg) => {
         setLastMsg(msg);
@@ -119,11 +130,27 @@ const ConversationItemComponent: React.FC<IProps> = (props) => {
             <>
               <ListItemAvatar>
                 <Box mr={2}>
-                  <Avatar
-                    alt={"john doe"}
-                    className={classes.avatar}
-                    src={"https://picsum.photos/200/300?random=1"}
-                  />
+                  <Badge
+                    variant="dot"
+                    overlap="circle"
+                    color={
+                      otherParticipantPresence?.state === "online"
+                        ? "primary"
+                        : otherParticipantPresence?.state === "away"
+                        ? "secondary"
+                        : "error"
+                    }
+                    anchorOrigin={{
+                      vertical: "bottom",
+                      horizontal: "right",
+                    }}
+                  >
+                    <Avatar
+                      alt={"john doe"}
+                      className={classes.avatar}
+                      src={"https://picsum.photos/200/300?random=1"}
+                    />
+                  </Badge>
                 </Box>
               </ListItemAvatar>
               <ListItemText
@@ -149,6 +176,7 @@ const ConversationItemComponent: React.FC<IProps> = (props) => {
                   )
                 }
               />
+
               <ListItemSecondaryAction>
                 <IconButton edge="end" aria-label="options">
                   <MoreHorizIcon />

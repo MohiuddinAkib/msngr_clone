@@ -58,8 +58,6 @@ const AppProvider: React.FC = (props) => {
           <ReactReduxFirebaseProvider
             config={{
               userProfile: "users",
-              presence: "presence",
-              sessions: "sessions",
               useFirestoreForProfile: true,
               useFirestoreForStorageMeta: true,
             }}

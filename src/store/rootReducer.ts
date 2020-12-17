@@ -5,11 +5,13 @@ import {FirebaseReducer, firebaseReducer, FirestoreReducer} from "react-redux-fi
 import { IProfile } from "@src/models/IProfile";
 import { IParticipant } from "@src/models/IParticipant";
 import { IConversation } from "@src/models/IConversation";
+import { IUserPresence } from "@src/models/IUserPresence";
 
 
 interface Schema {
     converstaions: IConversation;
     participants: IParticipant;
+    presence: IUserPresence
 }
 
 export default combineReducers<{
