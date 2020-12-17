@@ -1,6 +1,8 @@
 import React from "react";
 import useAuth from "@hooks/useAuth";
 import { useRouter } from "next/router";
+import IGif from "@giphy/js-types/dist/gif";
+import { isServer } from "@src/api/platformApi";
 import { IParticipant } from "@src/models/IParticipant";
 import { IUserMessage } from "@src/models/IUserMessage";
 import * as StorageTypes from "@firebase/storage-types";
@@ -58,6 +60,10 @@ export const MessengerContext = React.createContext<{
   ) => Promise<{
     uploadTaskSnapshot: StorageTypes.UploadTaskSnapshot;
   }>;
+  handleSendGifMsg: (conversationId: string, gif: IGif) => Promise<any>;
+  handleSendTextMsg: (conversationId: string, text: string) => Promise<any>;
+  updateConversationActivity: (conversationDocId: string) => Promise<void>;
+  getSelectedConversationIdOrFetchFromDb: () => Promise<string>;
 }>({
   conversations: null,
   selectedConvId: null,
@@ -70,6 +76,10 @@ export const MessengerContext = React.createContext<{
   handleSendAudioMessage: null,
   handleSendVideoMessage: null,
   handleSendScreenshotMessage: null,
+  handleSendGifMsg: null,
+  handleSendTextMsg: null,
+  updateConversationActivity: null,
+  getSelectedConversationIdOrFetchFromDb: null,
 });
 
 const MessengerProvider: React.FC = (props) => {
@@ -82,7 +92,12 @@ const MessengerProvider: React.FC = (props) => {
   // Profile related ends;
 
   // Conversations related starts
-  const [selectedConvId, setSelectedConvId] = React.useState("");
+  const [selectedConvId, setSelectedConvId] = React.useState(() => {
+    const convIdFromStorage = !isServer
+      ? localStorage.getItem("conversation_uid")
+      : null;
+    return convIdFromStorage || (router.query.conversation_uid as string) || "";
+  });
 
   const [conversations, setConversations] = React.useState<{
     [key: string]: IConversation;
@@ -239,7 +254,29 @@ const MessengerProvider: React.FC = (props) => {
 
   const selectConversation = (conversationId: string) => {
     setSelectedConvId(conversationId);
+    localStorage.setItem("conversation_uid", conversationId);
   };
+
+  const getSelectedConversationIdOrFetchFromDb = async () => {
+    if (!!selectedConvId) {
+      return selectedConvId;
+    } else {
+      const querySnapshot = await firestore
+        .collection(COLLECTIONS.conversations)
+        .where("deleted_at", "==", null)
+        // .orderBy("last_activity", "desc")
+        .limit(1)
+        .get();
+
+      return querySnapshot.docs[0].id;
+    }
+  };
+
+  const updateConversationActivity = async (conversationDocId: string) =>
+    firestore
+      .collection(COLLECTIONS.conversations)
+      .doc(conversationDocId)
+      .update({ last_activity: new Date(Date.now()) });
 
   const handleSendAudioMessage = (
     path: string,
@@ -355,6 +392,32 @@ const MessengerProvider: React.FC = (props) => {
       name,
     });
 
+  const handleSendGifMsg = (conversationDocId: string, gif: IGif) =>
+    firestore
+      .collection(COLLECTIONS.conversations)
+      .doc(conversationDocId)
+      .collection(COLLECTIONS.messages)
+      .add({
+        type: "gif",
+        message: gif,
+        deleted_at: null,
+        sender_id: auth.uid,
+        created_at: new Date().toISOString(),
+      });
+
+  const handleSendTextMsg = (conversationDocId: string, text: string) =>
+    firestore
+      .collection(COLLECTIONS.conversations)
+      .doc(conversationDocId)
+      .collection(COLLECTIONS.messages)
+      .add({
+        type: "text",
+        message: text,
+        deleted_at: null,
+        sender_id: auth.uid,
+        created_at: new Date().toISOString(),
+      });
+
   return (
     <MessengerContext.Provider
       value={{
@@ -369,6 +432,10 @@ const MessengerProvider: React.FC = (props) => {
         handleSendScreenshotMessage,
         addAuthConversationsListener,
         addConversationMessageListener,
+        handleSendGifMsg,
+        handleSendTextMsg,
+        updateConversationActivity,
+        getSelectedConversationIdOrFetchFromDb,
       }}
     >
       {props.children}

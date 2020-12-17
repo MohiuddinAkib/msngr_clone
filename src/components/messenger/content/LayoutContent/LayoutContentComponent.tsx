@@ -37,7 +37,11 @@ const LayoutContentComponent: React.FC = (props) => {
             universal
             style={{
               height: "100%",
+              overflowY: "hidden",
             }}
+            autoHide
+            autoHeight
+            autoHeightMin={"100%"}
           >
             <CardContent>{props.children}</CardContent>
           </Scrollbars>

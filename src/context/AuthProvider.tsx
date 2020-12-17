@@ -4,6 +4,7 @@ import { useRouter } from "next/router";
 import { useSelector } from "react-redux";
 import { IProfile } from "@src/models/IProfile";
 import { RootState } from "@store/configureStore";
+import * as AuthTypes from "@firebase/auth-types";
 import { useErrorHandler } from "react-error-boundary";
 import AuthIsLoadedComponent from "@components/auth/AuthIsLoaded";
 import {
@@ -25,7 +26,17 @@ const initialRegisterValues = {
   first_name: "",
 };
 
-export const AuthContext = React.createContext({
+export const AuthContext = React.createContext<{
+  user: AuthTypes.UserInfo;
+  profile: FirebaseReducer.Profile<IProfile>;
+  initialLoginValues: typeof initialLoginValues;
+  authenticated: boolean;
+  initialRegisterValues: typeof initialRegisterValues;
+  profileLoading: boolean;
+  handleLogout: Function;
+  handleLogin: Function;
+  handleRegister: Function;
+}>({
   user: null,
   profile: null,
   initialLoginValues,

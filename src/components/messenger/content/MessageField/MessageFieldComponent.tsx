@@ -1,4 +1,5 @@
 import React from "react";
+import useAuth from "@hooks/useAuth";
 import { useRouter } from "next/router";
 import Box from "@material-ui/core/Box";
 import { useSelector } from "react-redux";
@@ -9,9 +10,10 @@ import Drawer from "@material-ui/core/Drawer";
 import Popper from "@material-ui/core/Popper";
 import Hidden from "@material-ui/core/Hidden";
 import SendIcon from "@material-ui/icons/Send";
-import { RootState } from "@store/configureStore";
+import useMessenger from "@hooks/useMessenger";
 import Skeleton from "@material-ui/lab/Skeleton";
 import TextField from "@material-ui/core/TextField";
+import { useFirestore } from "react-redux-firebase";
 import { useErrorHandler } from "react-error-boundary";
 import IconButton from "@material-ui/core/IconButton";
 import Typography from "@material-ui/core/Typography";
@@ -23,7 +25,6 @@ import InputAdornment from "@material-ui/core/InputAdornment";
 import GifPickerComponent from "@components/common/GifPicker";
 import BottomNavigation from "@material-ui/core/BottomNavigation";
 import ClickAwayListener from "@material-ui/core/ClickAwayListener";
-import { FirebaseReducer, isLoaded, useFirestore } from "react-redux-firebase";
 import { createStyles, makeStyles, useTheme } from "@material-ui/core/styles";
 import BottomNavigationAction from "@material-ui/core/BottomNavigationAction";
 import SentimentSatisfiedAltIcon from "@material-ui/icons/SentimentSatisfied";
@@ -90,9 +91,11 @@ const MessageFieldComponent: React.FC = (props) => {
   const theme = useTheme();
   const classes = useStyles();
   const router = useRouter();
+  const messenger = useMessenger();
   const firestore = useFirestore();
   const handleError = useErrorHandler();
   const [text, setText] = React.useState("");
+  const { user: auth, authenticated } = useAuth();
   const mobile = useMediaQuery(theme.breakpoints.between("xs", "sm"));
   const [bottomNavVal, setBottomNavVal] = React.useState<BottomNavValType>(
     "emoji"
@@ -101,9 +104,6 @@ const MessageFieldComponent: React.FC = (props) => {
     variant: "popper",
     popupId: "emoji-popper",
   });
-  const auth = useSelector<RootState, FirebaseReducer.AuthState>(
-    (state) => state.firebase.auth
-  );
 
   const handleTextChange = (event: React.ChangeEvent<HTMLTextAreaElement>) => {
     setText(event.target.value);
@@ -143,37 +143,19 @@ const MessageFieldComponent: React.FC = (props) => {
   ) => {
     try {
       const conversationDocId = router.query.conversation_uid as string;
-      await firestore
-        .collection(COLLECTIONS.conversations)
-        .doc(conversationDocId)
-        .collection(COLLECTIONS.messages)
-        .add({
-          type: "gif",
-          message: gif,
-          deleted_at: null,
-          sender_id: auth.uid,
-          created_at: new Date().toISOString(),
-        });
+      await messenger.handleSendGifMsg(conversationDocId, gif);
+      await messenger.updateConversationActivity(conversationDocId);
     } catch (error) {
       handleError(error);
     }
   };
 
   const handleSendMsg = async () => {
-    if (!!text && isLoaded(auth)) {
+    if (!!text && authenticated) {
       try {
         const conversationDocId = router.query.conversation_uid as string;
-        await firestore
-          .collection(COLLECTIONS.conversations)
-          .doc(conversationDocId)
-          .collection(COLLECTIONS.messages)
-          .add({
-            type: "text",
-            message: text,
-            deleted_at: null,
-            sender_id: auth.uid,
-            created_at: new Date().toISOString(),
-          });
+        await messenger.handleSendTextMsg(conversationDocId, text);
+        await messenger.updateConversationActivity(conversationDocId);
         setText("");
       } catch (error) {
         handleError(error);

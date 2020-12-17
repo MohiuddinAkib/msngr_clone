@@ -178,10 +178,12 @@ const ActionContainerComponent: React.FC<Props> = (props) => {
       setAudioSending(true);
       // previewVideoRef.current.pause()
       try {
+        const conversationDocId = router.query.conversation_uid as string;
+
         await messenger.handleSendAudioMessage(
           "message-audios",
           recordedBlob.blob,
-          `conversations/${router.query.conversation_uid}/messages`,
+          `conversations/${conversationDocId}/messages`,
           {
             customMetadata: {
               sender_id: auth.uid,
@@ -190,6 +192,7 @@ const ActionContainerComponent: React.FC<Props> = (props) => {
           },
           `${auth.uid}-${moment().toISOString()}`
         );
+        await messenger.updateConversationActivity(conversationDocId);
       } catch (error) {
         // handleError(error)
       } finally {
@@ -288,11 +291,11 @@ const ActionContainerComponent: React.FC<Props> = (props) => {
         const rcrdBlob = new Blob(videoChunks, {
           type: "video/webm;codecs=vp8",
         });
-
+        const conversationDocId = router.query.conversation_uid as string;
         await messenger.handleSendVideoMessage(
           "message-videos",
           rcrdBlob,
-          `conversations/${router.query.conversation_uid}/messages`,
+          `conversations/${conversationDocId}/messages`,
           {
             customMetadata: {
               sender_id: auth.uid,
@@ -301,6 +304,7 @@ const ActionContainerComponent: React.FC<Props> = (props) => {
           },
           `${auth.uid}-${moment().toISOString()}`
         );
+        await messenger.updateConversationActivity(conversationDocId);
       } catch (error) {
         // handleError(error)
       } finally {

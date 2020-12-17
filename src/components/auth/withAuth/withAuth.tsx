@@ -16,7 +16,7 @@ export const withAuth = <T extends {}>(
         router.replace({
           pathname: "/login",
           query: {
-            next: router.pathname,
+            next: router.asPath,
           },
         });
       } else {
