@@ -233,7 +233,38 @@ const MessengerProvider: React.FC = (props) => {
         })
         .get();
 
-      return snapshot.data();
+      const conversation = snapshot.data();
+
+      conversation.setParticipantsDataFetcher(
+        (callback: (participants: Participant[]) => void) => {
+          firestore
+            .collection(
+              `${COLLECTIONS.conversations}/${conversation.id}/${COLLECTIONS.participants}`
+            )
+            .withConverter({
+              toFirestore: function (participant: Participant) {
+                return participant.raw;
+              },
+              fromFirestore: function (snapshot, options) {
+                const participant = snapshot.data(options) as IParticipant;
+
+                return new Participant(auth.uid, snapshot.id, participant);
+              },
+            })
+            .get()
+            .then((querySnapshot) => {
+              const participants: Participant[] = [];
+
+              querySnapshot.forEach((doc) => {
+                participants.push(doc.data());
+              });
+
+              callback(participants);
+            });
+        }
+      );
+
+      return conversation;
     } catch (e) {
       return e;
     }

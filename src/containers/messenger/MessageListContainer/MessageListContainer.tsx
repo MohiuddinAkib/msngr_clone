@@ -46,17 +46,12 @@ const MessageListContainer = () => {
     setOtherParticipantPresence,
   ] = React.useState<IUserPresence>(null);
 
-  // React.useEffect(() => {
-  //   console.log(scroller.current);
-  //   scroller.current.scrollIntoView({ behavior: "smooth" });
-  // }, []);
-
   React.useEffect(() => {
-    if (otherParticipantLoaded) {
-      const presence = auth.getUserPresence(otherParticipant.id);
+    if (otherParticipantLoaded && auth.presenceLoaded) {
+      const presence = auth.presence[otherParticipant.id];
       setOtherParticipantPresence(presence);
     }
-  }, [otherParticipant, otherParticipantLoaded]);
+  }, [otherParticipant, otherParticipantLoaded, auth.presence]);
 
   React.useEffect(() => {
     return messenger.addConversationMessageListener(

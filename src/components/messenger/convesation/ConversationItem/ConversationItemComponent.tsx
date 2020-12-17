@@ -64,10 +64,6 @@ const ConversationItemComponent: React.FC<IProps> = (props) => {
   }, [otherParticipant, otherParticipantLoaded, auth.presence]);
 
   React.useEffect(() => {
-    console.log("presence in conv item", otherParticipantPresence);
-  }, [otherParticipantPresence]);
-
-  React.useEffect(() => {
     props.conversation.addLastMessageListener(
       (msg) => {
         setLastMsg(msg);

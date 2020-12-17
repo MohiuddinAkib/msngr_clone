@@ -1,7 +1,10 @@
 import React from "react";
 import useAuth from "@hooks/useAuth";
 import styled from "styled-components";
+import { useRouter } from "next/router";
+import Box from "@material-ui/core/Box";
 import List from "@material-ui/core/List";
+import Badge from "@material-ui/core/Badge";
 import Avatar from "@material-ui/core/Avatar";
 import EditIcon from "@material-ui/icons/Edit";
 import Toolbar from "@material-ui/core/Toolbar";
@@ -11,6 +14,7 @@ import ListItem from "@material-ui/core/ListItem";
 import Collapse from "@material-ui/core/Collapse";
 import SearchIcon from "@material-ui/icons/Search";
 import ThumbUpIcon from "@material-ui/icons/ThumbUp";
+import useUserPresence from "@hooks/useUserPresence";
 import WarningIcon from "@material-ui/icons/Warning";
 import IconButton from "@material-ui/core/IconButton";
 import CardHeader from "@material-ui/core/CardHeader";
@@ -18,8 +22,10 @@ import CardContent from "@material-ui/core/CardContent";
 import ReportOffIcon from "@material-ui/icons/ReportOff";
 import ListItemText from "@material-ui/core/ListItemText";
 import ArrowBackIcon from "@material-ui/icons/ArrowBack";
+import { IUserPresence } from "@src/models/IUserPresence";
 import ExpandMoreIcon from "@material-ui/icons/ExpandMore";
 import TripOriginIcon from "@material-ui/icons/TripOrigin";
+import useOtherParticipant from "@hooks/useOtherParticipant";
 import NotificationsIcon from "@material-ui/icons/Notifications";
 import KeyboardArrowLeftIcon from "@material-ui/icons/KeyboardArrowLeft";
 import { createStyles, makeStyles, useTheme } from "@material-ui/core/styles";
@@ -30,6 +36,7 @@ import {
   getSidebarTrigger,
   getHeader,
 } from "@mui-treasury/layout";
+import moment from "moment";
 
 const Header = getHeader(styled);
 const DrawerSidebar = getDrawerSidebar(styled);
@@ -40,7 +47,6 @@ const useStyles = makeStyles((theme) =>
   createStyles({
     infoDrawerPaper: {},
     profileAvatar: {
-      margin: "auto",
       height: 100,
       width: 100,
     },
@@ -57,9 +63,16 @@ const useStyles = makeStyles((theme) =>
 const InfoListDrawerComponent: React.FC = (props) => {
   const auth = useAuth();
   const theme = useTheme();
+  const router = useRouter();
   const classes = useStyles();
   const [showMoreActions, setShowMoreActions] = React.useState(false);
   const [showPrivacyAndPolicy, setShowPrivacyAndPolicy] = React.useState(false);
+  const {
+    conversation,
+    otherParticipant,
+    otherParticipantLoaded,
+    otherParticipantPresence,
+  } = useUserPresence(router.query.conversation_uid as string);
 
   const handleMoreActionsCollapse = () => {
     setShowMoreActions((prevState) => !prevState);
@@ -83,10 +96,28 @@ const InfoListDrawerComponent: React.FC = (props) => {
 
         <Toolbar />
         <CardContent>
-          <Avatar
-            className={classes.profileAvatar}
-            src={"https://picsum.photos/200/300?random=3"}
-          />
+          <Box textAlign={"center"}>
+            <Badge
+              variant="dot"
+              overlap="circle"
+              color={
+                otherParticipantPresence?.state === "online"
+                  ? "primary"
+                  : otherParticipantPresence?.state === "away"
+                  ? "secondary"
+                  : "error"
+              }
+              anchorOrigin={{
+                vertical: "bottom",
+                horizontal: "right",
+              }}
+            >
+              <Avatar
+                className={classes.profileAvatar}
+                src={"https://picsum.photos/200/300?random=3"}
+              />
+            </Badge>
+          </Box>
           <CardHeader
             titleTypographyProps={{
               classes: {
@@ -98,10 +129,23 @@ const InfoListDrawerComponent: React.FC = (props) => {
                 root: classes.activeStatusRoot,
               },
             }}
-            title={"John doe"}
-            subheader={"Active 15min ago"}
+            title={
+              conversation
+                ? conversation.isGroupType
+                  ? conversation.title
+                  : otherParticipant?.nickname || ""
+                : ""
+            }
+            subheader={
+              otherParticipantPresence?.state === "online"
+                ? "Active now"
+                : otherParticipantPresence?.last_changed
+                ? `Active ${moment(
+                    otherParticipantPresence.last_changed
+                  ).fromNow()}`
+                : ""
+            }
           />
-          {/*TODO: presence implementation*/}
         </CardContent>
         <List>
           <Divider component={"li"} />

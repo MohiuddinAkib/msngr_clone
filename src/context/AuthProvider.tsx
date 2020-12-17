@@ -81,10 +81,6 @@ const AuthProvider: React.FC = (props) => {
               last_changed: moment().toISOString(),
             });
           } else {
-            snapshot.ref.push({
-              state: "away",
-              last_changed: moment().toISOString(),
-            });
           }
         } else {
           if (snapshot.exists()) {
@@ -93,10 +89,6 @@ const AuthProvider: React.FC = (props) => {
               last_changed: moment().toISOString(),
             });
           } else {
-            snapshot.ref.push({
-              state: "online",
-              last_changed: moment().toISOString(),
-            });
           }
         }
       });

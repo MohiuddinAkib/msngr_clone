@@ -12,6 +12,7 @@ const useOtherParticipant = (conversationId: string | Conversation) => {
     const [otherParticipantLoaded, setOtherParticipantLoaded] = React.useState(
         false
       );
+    const [conversation, setConversation] = React.useState<Conversation>(null)
 
     React.useEffect(() => {
         if(conversationId instanceof Conversation) {
@@ -28,11 +29,11 @@ const useOtherParticipant = (conversationId: string | Conversation) => {
             (async() => {
                 try {
                     const conversation = await messenger.getConversationById(conversationId)
+                    setConversation(conversation)
                     conversation.getParticipantsData((participants) => {
                         const [otherPerson] = participants.filter(
                           (participant) => !participant.isMe
                         );
-                        alert(otherPerson.id)
                   
                         setOtherParticipant(otherPerson);
                         setOtherParticipantLoaded(true);
@@ -45,7 +46,7 @@ const useOtherParticipant = (conversationId: string | Conversation) => {
         
       }, []);
 
-      return {otherParticipant, otherParticipantLoaded}
+      return {otherParticipant, otherParticipantLoaded, conversation}
 }
 
 export default useOtherParticipant
