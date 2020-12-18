@@ -12,6 +12,7 @@ import {
   isEmpty,
   isLoaded,
   useFirebase,
+  useFirebaseConnect,
   FirebaseReducer,
 } from "react-redux-firebase";
 
@@ -39,6 +40,7 @@ export const AuthContext = React.createContext<{
   handleRegister: Function;
   presence: Record<string, IUserPresence>;
   presenceLoaded: boolean;
+  getUserPresence: (userId: string) => IUserPresence;
 }>({
   user: null,
   profile: null,
@@ -51,6 +53,7 @@ export const AuthContext = React.createContext<{
   handleRegister: (values: typeof initialRegisterValues) => null,
   presence: null,
   presenceLoaded: null,
+  getUserPresence: null,
 });
 
 const AuthProvider: React.FC = (props) => {
@@ -68,6 +71,8 @@ const AuthProvider: React.FC = (props) => {
     (state) => state.firebase.profile
   );
   // Profile related ends;
+
+  useFirebaseConnect("presence");
 
   function userStatusAwayOnDocumentVisibilityHanler(e) {
     firebase
@@ -184,6 +189,15 @@ const AuthProvider: React.FC = (props) => {
     }
   };
 
+  const getUserPresence = React.useCallback(
+    (userId: string) => {
+      return !isEmpty(auth) && isLoaded(auth)
+        ? presence[userId]
+        : ({ state: "offline", last_changed: "" } as IUserPresence);
+    },
+    [presence]
+  );
+
   return (
     <AuthIsLoadedComponent>
       <AuthContext.Provider
@@ -199,6 +213,7 @@ const AuthProvider: React.FC = (props) => {
           authenticated: !isEmpty(auth) && isLoaded(auth),
           presence,
           presenceLoaded: isLoaded(presence) && !isEmpty(presence),
+          getUserPresence,
         }}
       >
         {props.children}

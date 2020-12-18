@@ -1,18 +1,14 @@
 import React from "react";
 import Link from "next/link";
-import useAuth from "@hooks/useAuth";
 import Box from "@material-ui/core/Box";
 import Badge from "@material-ui/core/Badge";
 import Avatar from "@material-ui/core/Avatar";
-import Skeleton from "@material-ui/lab/Skeleton";
 import ListItem from "@material-ui/core/ListItem";
-import { Message } from "@src/data/domain/Message";
+import useUserPresence from "@hooks/useUserPresence";
 import IconButton from "@material-ui/core/IconButton";
 import Typography from "@material-ui/core/Typography";
 import MoreHorizIcon from "@material-ui/icons/MoreHoriz";
-import { IUserPresence } from "@src/models/IUserPresence";
 import ListItemText from "@material-ui/core/ListItemText";
-import useOtherParticipant from "@hooks/useOtherParticipant";
 import { Conversation } from "@src/data/domain/Conversation";
 import ListItemAvatar from "@material-ui/core/ListItemAvatar";
 import { createStyles, makeStyles } from "@material-ui/core/styles";
@@ -21,8 +17,6 @@ import {
   ISwipeableListItemProps,
 } from "@sandstreamdev/react-swipeable-list";
 import ListItemSecondaryAction from "@material-ui/core/ListItemSecondaryAction";
-import { useSelector } from "react-redux";
-import { RootState } from "@store/configureStore";
 
 const useStyles = makeStyles((theme) =>
   createStyles({
@@ -30,6 +24,9 @@ const useStyles = makeStyles((theme) =>
     avatar: {
       height: 50,
       width: 50,
+    },
+    listItemContainer: {
+      width: "100%",
     },
   })
 );
@@ -42,39 +39,9 @@ interface IProps extends ISwipeableListItemProps {
 }
 
 const ConversationItemComponent: React.FC<IProps> = (props) => {
-  const auth = useAuth();
   const classes = useStyles();
-
   const [blockSwipe, setBlockSwipe] = React.useState(false);
-  const [lastMsg, setLastMsg] = React.useState<Message>(null);
-
-  const { otherParticipant, otherParticipantLoaded } = useOtherParticipant(
-    props.conversation
-  );
-  const [
-    otherParticipantPresence,
-    setOtherParticipantPresence,
-  ] = React.useState<IUserPresence>(null);
-
-  React.useEffect(() => {
-    if (otherParticipantLoaded && auth.presenceLoaded) {
-      const presence = auth.presence[otherParticipant.id];
-      setOtherParticipantPresence(presence);
-    }
-  }, [otherParticipant, otherParticipantLoaded, auth.presence]);
-
-  React.useEffect(() => {
-    props.conversation.addLastMessageListener(
-      (msg) => {
-        setLastMsg(msg);
-      },
-      () => {}
-    );
-
-    return () => {
-      props.conversation.removeLastMessageListener();
-    };
-  }, []);
+  const chatPartner = useUserPresence(props.conversation.chatPartner.id);
 
   const handleClick = () => {
     props.onConversationClicked(props.conversation.id);
@@ -103,83 +70,67 @@ const ConversationItemComponent: React.FC<IProps> = (props) => {
           component={"a"}
           onClick={handleClick}
           selected={props.selected}
+          ContainerComponent={"div"}
+          ContainerProps={{
+            className: classes.listItemContainer,
+          }}
         >
-          {!props.conversation.lastMessageLoaded || !otherParticipantLoaded ? (
-            <Box width={"100%"} display={"flex"}>
-              <Box mr={1}>
-                <Skeleton variant="circle">
-                  <Avatar className={classes.avatar} />
-                </Skeleton>
-              </Box>
-
-              <Box flex={1}>
-                <Skeleton width={"85%"}>
-                  <Typography>.</Typography>
-                </Skeleton>
-
-                <Skeleton width={"50%"}>
-                  <Typography>.</Typography>
-                </Skeleton>
-              </Box>
+          <ListItemAvatar>
+            <Box mr={2}>
+              <Badge
+                variant="dot"
+                overlap="circle"
+                color={
+                  chatPartner?.state === "online"
+                    ? "primary"
+                    : chatPartner?.state === "away"
+                    ? "secondary"
+                    : "error"
+                }
+                anchorOrigin={{
+                  vertical: "bottom",
+                  horizontal: "right",
+                }}
+              >
+                <Avatar
+                  alt={"john doe"}
+                  className={classes.avatar}
+                  src={"https://picsum.photos/200/300?random=1"}
+                />
+              </Badge>
             </Box>
-          ) : (
-            <>
-              <ListItemAvatar>
-                <Box mr={2}>
-                  <Badge
-                    variant="dot"
-                    overlap="circle"
-                    color={
-                      otherParticipantPresence?.state === "online"
-                        ? "primary"
-                        : otherParticipantPresence?.state === "away"
-                        ? "secondary"
-                        : "error"
-                    }
-                    anchorOrigin={{
-                      vertical: "bottom",
-                      horizontal: "right",
-                    }}
-                  >
-                    <Avatar
-                      alt={"john doe"}
-                      className={classes.avatar}
-                      src={"https://picsum.photos/200/300?random=1"}
-                    />
-                  </Badge>
-                </Box>
-              </ListItemAvatar>
-              <ListItemText
-                primary={
-                  props.conversation.isGroupType
-                    ? props.conversation.title
-                    : otherParticipant.nickname
-                }
-                secondary={
-                  props.conversation.lastMessageLoaded && (
-                    <>
-                      <Typography
-                        variant="body2"
-                        component="span"
-                        color="textPrimary"
-                      >
-                        {lastMsg.isTextType
-                          ? lastMsg.messageContent
-                          : `You sent a ${lastMsg.isGifType ? "Gif" : "File"}`}
-                      </Typography>
-                      {` - ${lastMsg.created_at_fcalendar}`}
-                    </>
-                  )
-                }
-              />
+          </ListItemAvatar>
+          <ListItemText
+            primary={
+              props.conversation.isGroupType
+                ? props.conversation.title
+                : props.conversation.chatPartner.nickname
+            }
+            secondary={
+              <>
+                <Typography
+                  variant="body2"
+                  component="span"
+                  color="textPrimary"
+                >
+                  {props.conversation.lastMessage.isTextType
+                    ? props.conversation.lastMessage.messageContent
+                    : `You sent a ${
+                        props.conversation.lastMessage.isGifType
+                          ? "Gif"
+                          : "File"
+                      }`}
+                </Typography>
+                {` - ${props.conversation.lastMessage.created_at_fcalendar}`}
+              </>
+            }
+          />
 
-              <ListItemSecondaryAction>
-                <IconButton edge="end" aria-label="options">
-                  <MoreHorizIcon />
-                </IconButton>
-              </ListItemSecondaryAction>
-            </>
-          )}
+          <ListItemSecondaryAction>
+            <IconButton edge="end" aria-label="options">
+              <MoreHorizIcon />
+            </IconButton>
+          </ListItemSecondaryAction>
         </ListItem>
       </Link>
     </SwipeableListItem>

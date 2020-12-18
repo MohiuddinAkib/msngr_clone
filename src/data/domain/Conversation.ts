@@ -1,22 +1,46 @@
-import { Message } from "./Message";
 import { Participant } from "./Participant";
+import { Message, MessageBlock } from "./Message";
+import { IParticipant } from "@src/models/IParticipant";
 import { IConversation } from "@src/models/IConversation";
+import { IUserFormattedMessage, IUserMessage } from "@src/models/IUserMessage";
 
 export class Conversation {
-    private _participants = [];
-    private _lastMessageLoaded = false;
     private _participantsDataLoaded = false;
-    private _lastMessageObserver: Function;
+    private _messages: Record<string, Message>
     private _participantsDataFetcher: Function;
-    private _lastMessageObserverUnsubscribe: () => void;
+    private _formattedMessages: MessageBlock[]
+    private _participants: Record<string, Participant>;
 
-    constructor(private readonly _id:string, private readonly _conversation: IConversation) {
+    constructor(private readonly _authId: string, private readonly _id:string, private readonly _conversation: IConversation) {
 
     }
 
-    setLastMessageObserver(callback: Function) {
-        if(!this._lastMessageObserver) {
-            this._lastMessageObserver = callback;
+    setMessages(messages: Record<string, IUserMessage>) {
+        if(!this._messages) {
+            this._messages = Object.entries(messages).map(([id, message]) => new Message(this._authId, id, message)).reduce((acc, curr) => {
+                acc[curr.id] = curr
+                return acc
+            }, {});
+        }
+    }
+
+    setParticipants(participants: Record<string, IParticipant>) {
+        if(!this._participants) {
+            this._participants = Object.entries(participants).map(([id, participant]) => new Participant(this._authId, id, participant)).reduce((acc, curr) => {
+                acc[curr.id] = curr
+                return acc
+            }, {});
+        }
+    }
+
+    setFormattedMessages(formatterMessages: IUserFormattedMessage[]) {
+        if(!this._formattedMessages) {
+            this._formattedMessages = formatterMessages
+            .map(formattedMessage => ({
+                key: formattedMessage.key,
+                messages: formattedMessage.messages.map(message => new Message(this._authId, message.id, message))
+            }))
+            .map(formattedMessage => new MessageBlock(formattedMessage.key, formattedMessage.messages))
         }
     }
 
@@ -35,12 +59,24 @@ export class Conversation {
         }
     }
 
-    get participantsDataLoaded() {
-        return this._participantsDataLoaded
+    get chatPartner () {
+        return Object.values(this._participants).filter(participant => participant.id !== this._authId)[0]
     }
 
-    get lastMessageLoaded() {
-        return this._lastMessageLoaded
+    get messages() {
+        return this._messages;
+    }
+
+    get lastMessage() {
+        return Object.values(this._messages).reverse()[0]
+    }
+
+    get formattedMessages() {
+        return this._formattedMessages
+    }
+
+    get participantsDataLoaded() {
+        return this._participantsDataLoaded
     }
 
     get raw() {
@@ -89,21 +125,5 @@ export class Conversation {
 
     get deleted_at() {
         return this._conversation.deleted_at
-    }
-
-    addLastMessageListener(onSuccess: (msg: Message) => void, onError: (error: Error) => void) {
-        if(this._lastMessageObserver) {
-           this._lastMessageObserverUnsubscribe =  this._lastMessageObserver((msg) => {
-            this._lastMessageLoaded = true;
-               onSuccess(msg)
-            }, onError)
-        }
-
-    }
-
-    removeLastMessageListener() {
-        if(this._lastMessageObserverUnsubscribe) {
-            this._lastMessageObserverUnsubscribe()
-        }
     }
 }

@@ -1,5 +1,6 @@
 import React from "react";
 import List from "@material-ui/core/List";
+import { Message } from "@src/data/domain/Message";
 import SearchIcon from "@material-ui/icons/Search";
 import TextField from "@material-ui/core/TextField";
 import { Scrollbars } from "react-custom-scrollbars";

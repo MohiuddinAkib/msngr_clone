@@ -1,28 +1,16 @@
 import React from "react";
+import { useSelector } from "react-redux";
 import useMessenger from "@hooks/useMessenger";
 import { useTheme } from "@material-ui/core/styles";
 import useMediaQuery from "@material-ui/core/useMediaQuery";
+import { conversationsLoadingSelector } from "@store/features/conversation/conversationSlice";
 import ConversationListComponent from "@components/messenger/convesation/ConversationList/ConversationListComponent";
 
 const ConversationListContainer: React.FC = (props) => {
   const theme = useTheme();
   const messenger = useMessenger();
   const pc = useMediaQuery(theme.breakpoints.up("md"));
-  const [conversations, setConversations] = React.useState([]);
-
-  React.useEffect(() => {
-    return messenger.addAuthConversationsListener(
-      (convs) => {
-        setConversations(convs);
-      },
-      (error) => {
-        alert(
-          "auth conversation listener error inside ConversationListContainer"
-        );
-        console.log(error);
-      }
-    );
-  }, []);
+  const conversationsLoading = useSelector(conversationsLoadingSelector);
 
   const conversationClickHandler = (conversationId) => {
     messenger.selectConversation(conversationId);
@@ -31,7 +19,7 @@ const ConversationListContainer: React.FC = (props) => {
   return (
     <ConversationListComponent
       blockSwipe={pc}
-      conversations={conversations}
+      conversations={messenger.conversationsArray}
       onConversationClicked={conversationClickHandler}
       selectedConversationId={messenger.selectedConvId}
       swipeLeft={{

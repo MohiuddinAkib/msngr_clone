@@ -7,6 +7,7 @@ import List from "@material-ui/core/List";
 import Badge from "@material-ui/core/Badge";
 import Avatar from "@material-ui/core/Avatar";
 import EditIcon from "@material-ui/icons/Edit";
+import useMessenger from "@hooks/useMessenger";
 import Toolbar from "@material-ui/core/Toolbar";
 import Divider from "@material-ui/core/Divider";
 import BlockIcon from "@material-ui/icons/Block";
@@ -22,13 +23,11 @@ import CardContent from "@material-ui/core/CardContent";
 import ReportOffIcon from "@material-ui/icons/ReportOff";
 import ListItemText from "@material-ui/core/ListItemText";
 import ArrowBackIcon from "@material-ui/icons/ArrowBack";
-import { IUserPresence } from "@src/models/IUserPresence";
 import ExpandMoreIcon from "@material-ui/icons/ExpandMore";
 import TripOriginIcon from "@material-ui/icons/TripOrigin";
-import useOtherParticipant from "@hooks/useOtherParticipant";
 import NotificationsIcon from "@material-ui/icons/Notifications";
+import { createStyles, makeStyles } from "@material-ui/core/styles";
 import KeyboardArrowLeftIcon from "@material-ui/icons/KeyboardArrowLeft";
-import { createStyles, makeStyles, useTheme } from "@material-ui/core/styles";
 import ListItemSecondaryAction from "@material-ui/core/ListItemSecondaryAction";
 import {
   getSidebarContent,
@@ -62,17 +61,15 @@ const useStyles = makeStyles((theme) =>
 
 const InfoListDrawerComponent: React.FC = (props) => {
   const auth = useAuth();
-  const theme = useTheme();
   const router = useRouter();
   const classes = useStyles();
+  const messenger = useMessenger();
   const [showMoreActions, setShowMoreActions] = React.useState(false);
   const [showPrivacyAndPolicy, setShowPrivacyAndPolicy] = React.useState(false);
-  const {
-    conversation,
-    otherParticipant,
-    otherParticipantLoaded,
-    otherParticipantPresence,
-  } = useUserPresence(router.query.conversation_uid as string);
+  const conversation = messenger.getConversationById(
+    router.query.conversation_uid as string
+  );
+  const chatPartnerPresence = useUserPresence(conversation.chatPartner.id);
 
   const handleMoreActionsCollapse = () => {
     setShowMoreActions((prevState) => !prevState);
@@ -101,9 +98,9 @@ const InfoListDrawerComponent: React.FC = (props) => {
               variant="dot"
               overlap="circle"
               color={
-                otherParticipantPresence?.state === "online"
+                chatPartnerPresence?.state === "online"
                   ? "primary"
-                  : otherParticipantPresence?.state === "away"
+                  : chatPartnerPresence?.state === "away"
                   ? "secondary"
                   : "error"
               }
@@ -133,16 +130,14 @@ const InfoListDrawerComponent: React.FC = (props) => {
               conversation
                 ? conversation.isGroupType
                   ? conversation.title
-                  : otherParticipant?.nickname || ""
+                  : conversation.chatPartner?.nickname || ""
                 : ""
             }
             subheader={
-              otherParticipantPresence?.state === "online"
+              chatPartnerPresence?.state === "online"
                 ? "Active now"
-                : otherParticipantPresence?.last_changed
-                ? `Active ${moment(
-                    otherParticipantPresence.last_changed
-                  ).fromNow()}`
+                : chatPartnerPresence?.last_changed
+                ? `Active ${moment(chatPartnerPresence.last_changed).fromNow()}`
                 : ""
             }
           />

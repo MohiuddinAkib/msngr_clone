@@ -33,37 +33,14 @@ const MessageListContainer = () => {
   const [newMessagesCount, setNewMessagesCount] = React.useState(0);
   const [showScrollerBtn, setShowScrollerBtn] = React.useState(false);
   const [newMessageArrived, setNewMessageArrived] = React.useState(false);
-  const [messageBlocks, setMessageBlocks] = React.useState<MessageBlock[]>([]);
+
+  const messageBlocks = messenger.selectedConversation.formattedMessages;
   const prevMessageBlocks = usePrevious<MessageBlock[]>(messageBlocks);
   const prevMessageBlocksMessagesCount = React.useRef(
     prevMessageBlocks?.length || 0
   );
-  const { otherParticipant, otherParticipantLoaded } = useOtherParticipant(
-    router.query.conversation_uid as string
-  );
-  const [
-    otherParticipantPresence,
-    setOtherParticipantPresence,
-  ] = React.useState<IUserPresence>(null);
 
-  React.useEffect(() => {
-    if (otherParticipantLoaded && auth.presenceLoaded) {
-      const presence = auth.presence[otherParticipant.id];
-      setOtherParticipantPresence(presence);
-    }
-  }, [otherParticipant, otherParticipantLoaded, auth.presence]);
-
-  React.useEffect(() => {
-    return messenger.addConversationMessageListener(
-      router.query.conversation_uid as string,
-      (msgBlocks) => {
-        setMessageBlocks(msgBlocks);
-      },
-      (error) => {
-        console.log(error);
-      }
-    );
-  }, [router.query.conversation_uid]);
+  console.log(prevMessageBlocks);
 
   React.useEffect(() => {
     if (newMessageArrived && !isElementInViewport(scroller.current)) {
@@ -74,7 +51,7 @@ const MessageListContainer = () => {
   }, [newMessageArrived]);
 
   React.useEffect(() => {
-    if (messageBlocks.length && prevMessageBlocks.length) {
+    if (messageBlocks.length && prevMessageBlocks && prevMessageBlocks.length) {
       const lastMessageBlock = messageBlocks[messageBlocks.length - 1];
       const prevLastMessageBlock =
         prevMessageBlocks[prevMessageBlocks.length - 1];

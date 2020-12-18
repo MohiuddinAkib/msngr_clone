@@ -50,13 +50,11 @@ const MessagesPeopleTab: React.FC<{ initialView?: number }> = (props) => {
 
   React.useEffect(() => {
     if (pc) {
-      (async () => {
-        const conversationId = await messenger.getSelectedConversationIdOrFetchFromDb();
-        router.replace(
-          "/messages/[conversation_uid]",
-          `/messages/${conversationId}`
-        );
-      })();
+      const conversationId = messenger.getSelectedConversationId();
+      router.replace(
+        "/messages/[conversation_uid]",
+        `/messages/${conversationId}`
+      );
     }
   }, [pc]);
 
