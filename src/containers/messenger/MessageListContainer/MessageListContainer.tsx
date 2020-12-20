@@ -1,6 +1,4 @@
 import React from "react";
-import useAuth from "@hooks/useAuth";
-import { useRouter } from "next/router";
 import Fab from "@material-ui/core/Fab";
 import Box from "@material-ui/core/Box";
 import Badge from "@material-ui/core/Badge";
@@ -23,8 +21,6 @@ const useStyles = makeStyles((theme) =>
 );
 
 const MessageListContainer = () => {
-  const auth = useAuth();
-  const router = useRouter();
   const classes = useStyles();
   const messenger = useMessenger();
   const scroller = React.useRef<HTMLDivElement>();

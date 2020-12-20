@@ -137,7 +137,7 @@ const MessengerProvider: React.FC = (props) => {
 
   // TODO: listen for conversation and add to store if does not exist in the store already
   React.useEffect(() => {
-    if (!conversationsLoading) {
+    if (!conversationsLoading && authenticated) {
       return firestore
         .collectionGroup(COLLECTIONS.conversations)
         .where("deleted_at", "==", null)
@@ -163,10 +163,10 @@ const MessengerProvider: React.FC = (props) => {
           });
         });
     }
-  }, [conversationsLoading]);
+  }, [conversationsLoading, authenticated]);
 
   React.useEffect(() => {
-    if (!conversationsLoading) {
+    if (!conversationsLoading && authenticated) {
       return firestore
         .collectionGroup(COLLECTIONS.messages)
         .where("deleted_at", "==", null)
@@ -204,7 +204,7 @@ const MessengerProvider: React.FC = (props) => {
           });
         });
     }
-  }, [conversationsLoading]);
+  }, [conversationsLoading, authenticated]);
 
   const showProfileMenu = () => {
     setOpenProfileMenu(true);
