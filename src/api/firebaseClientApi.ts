@@ -5,13 +5,13 @@ import "firebase/storage"
 import "firebase/firestore"
 
 export const fbConfig = {
-    apiKey: "AIzaSyC3Gp6gY_yOqH02TpAjbitK4JXgV5Raw-4",
-    authDomain: "myapps-fde31.firebaseapp.com",
-    databaseURL: "https://myapps-fde31.firebaseio.com",
-    projectId: "myapps-fde31",
-    storageBucket: "myapps-fde31.appspot.com",
-    messagingSenderId: "155579129246",
-    appId: "1:155579129246:web:04568f01562c62222f8a8f"
+    apiKey: process.env.FIREBASE_API_KEY,
+    authDomain: process.env.FIREBASE_AUTH_DOMAIN,
+    databaseURL: process.env.DIREBASE_DATABASE_URL,
+    projectId: process.env.FIREBASE_PROJECT_ID,
+    storageBucket: process.env.FIREBASE_STORAGE_BUCKET,
+    messagingSenderId: process.env.FIREBASE_MESSAGING_SENDER_ID,
+    appId: process.env.FIREBASE_APP_ID
 }
 
 export default !firebase.apps.length ? firebase.initializeApp(fbConfig) : firebase.app();

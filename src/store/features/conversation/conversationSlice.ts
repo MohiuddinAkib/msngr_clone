@@ -9,7 +9,7 @@ import { authStateSelector } from "@store/selectors/authSelector";
 import { formatMessageWithoutConverter } from "@src/api/conversationApi";
 import { IStoreUserConversation } from "@store/types/IStoreUserConversation";
 import { Conversation } from "@src/data/firestoreClient/domain/Conversation";
-import {createAsyncThunk, createSlice, createSelector, PayloadAction} from "@reduxjs/toolkit";
+import {createAsyncThunk, createSlice, createSelector, PayloadAction, current} from "@reduxjs/toolkit";
 
 const initialState: ConversationState = {
     loading: false,
@@ -176,9 +176,22 @@ export const conversationSlice = createSlice({
             messageId: string;
             message: IUserMessage}>) => {
             const {conversationId, messageId, message} = action.payload
-            const conversations = state.user_conversations[conversationId]
-            if(conversations) {
-                conversations.messages[messageId] = message
+            const conversation = state.user_conversations[conversationId]
+            if(conversation) {
+                conversation.messages[messageId] = message
+
+                const formattedMessages = conversation.formatted_messages
+                const formattedMessagesLen = formattedMessages.length
+                const lastFormattedMessage = formattedMessages[formattedMessagesLen - 1]
+
+                if(lastFormattedMessage.messages[0].sender_id === message.sender_id) {
+                    lastFormattedMessage.messages.push({id: messageId, ...message})
+                } else {
+                    formattedMessages.push({
+                        key: messageId,
+                        messages: [{id: messageId, ...message}]
+                    })
+                }
             }
         }
     },
