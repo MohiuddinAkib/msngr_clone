@@ -70,6 +70,10 @@ const ConversationListDrawerHeaderComponent: React.FC<Props> = (props) => {
   const messenger = useMessenger();
   const atMdAndLg = useMediaQuery(theme.breakpoints.between("md", "lg"));
 
+  const handleLogout = () => {
+    auth.handleLogout();
+  };
+
   return (
     <>
       <AppBar
@@ -180,7 +184,7 @@ const ConversationListDrawerHeaderComponent: React.FC<Props> = (props) => {
               <ListItemText primary="Edit" />
             </ListItem>
 
-            <ListItem button onClick={auth.handleLogout}>
+            <ListItem button onClick={handleLogout}>
               <ListItemIcon>
                 <ExitToAppIcon />
               </ListItemIcon>

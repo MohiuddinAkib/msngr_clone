@@ -25,23 +25,23 @@ const Conversation: NextPage = (props) => {
 
 export default withAuth(Conversation);
 
-export const getServerSideProps: GetServerSideProps = async (
-  ctx: GetServerSidePropsContext
-) => {
-  try {
-    const cookies = new Cookies(ctx.req.headers.cookie);
-    const token = cookies.get("token");
-    const auth = await firebaseAdminApi.auth().verifyIdToken(token);
-    if (!auth) {
-      return {
-        props: {},
-        redirect: "/login",
-      };
-    }
-  } catch (error) {
-  } finally {
-    return {
-      props: {},
-    };
-  }
-};
+// export const getServerSideProps: GetServerSideProps = async (
+//   ctx: GetServerSidePropsContext
+// ) => {
+//   try {
+//     const cookies = new Cookies(ctx.req.headers.cookie);
+//     const token = cookies.get("token");
+//     const auth = await firebaseAdminApi.auth().verifyIdToken(token);
+//     if (!auth) {
+//       return {
+//         props: {},
+//         redirect: "/login",
+//       };
+//     }
+//   } catch (error) {
+//   } finally {
+//     return {
+//       props: {},
+//     };
+//   }
+// };
