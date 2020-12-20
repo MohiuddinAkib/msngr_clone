@@ -21,7 +21,7 @@
     "resolveJsonModule": true,
     "isolatedModules": true,
     "jsx": "preserve",
-    "types": ["reflect-metadata"],
+    "types": ["reflect-metadata", "node", "dom-mediacapture-record"],
     "baseUrl": ".",
     "paths": {
       "@assets/*": [
