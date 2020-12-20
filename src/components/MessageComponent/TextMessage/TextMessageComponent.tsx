@@ -10,7 +10,7 @@ import { Gif } from "@giphy/react-components";
 import Avatar from "@material-ui/core/Avatar";
 import ReplyIcon from "@material-ui/icons/Reply";
 import ListItem from "@material-ui/core/ListItem";
-import { Message } from "@src/data/domain/Message";
+import { Message } from "@src/data/firestoreClient/domain/Message";
 import IconButton from "@material-ui/core/IconButton";
 import CardContent from "@material-ui/core/CardContent";
 import blueGrey from "@material-ui/core/colors/blueGrey";

@@ -4,9 +4,10 @@ import useAuth from "@hooks/useAuth";
 import { useRouter } from "next/router";
 import { useSelector } from "react-redux";
 import IGif from "@giphy/js-types/dist/gif";
+import { IUserMessage } from "@src/models/IUserMessage";
 import * as StorageTypes from "@firebase/storage-types";
 import { COLLECTIONS } from "@src/api/firebaseClientApi";
-import { Conversation } from "@src/data/domain/Conversation";
+import { Conversation } from "@src/data/firestoreClient/domain/Conversation";
 import { RootState, useAppDispatch } from "@store/configureStore";
 import {
   useFirebase,
@@ -15,9 +16,12 @@ import {
 } from "react-redux-firebase";
 import {
   conversationSlice,
-  conversationsLoadingSelector,
-  loadAuthConversationData,
+  userMessageIdsSelector,
+  loadNewConversationData,
+  loadAuthConversationsData,
+  userConversationIdsSelector,
   selectedConversationSelector,
+  conversationsLoadingSelector,
   userConversationsArrayConvertedSelector,
   userConversationsMapConvertedSelector,
 } from "@store/features/conversation/conversationSlice";
@@ -61,7 +65,7 @@ export const MessengerContext = React.createContext<{
   handleSendGifMsg: (conversationId: string, gif: IGif) => Promise<any>;
   handleSendTextMsg: (conversationId: string, text: string) => Promise<any>;
   updateConversationActivity: (conversationDocId: string) => Promise<void>;
-  getSelectedConversationId: () => Promise<string>;
+  getSelectedConversationId: () => string;
   getConversationById: (conversationId: string) => Conversation;
   selectedConversation: Conversation;
 }>({
@@ -95,9 +99,9 @@ const MessengerProvider: React.FC = (props) => {
   const conversationsArray = useSelector(
     userConversationsArrayConvertedSelector
   );
+  const userMessageIds = useSelector(userMessageIdsSelector);
+  const userConversationIds = useSelector(userConversationIdsSelector);
   const selectedConversation = useSelector(selectedConversationSelector);
-
-  // TODO: listen for conversation and add to store if does not exist in the store already
 
   // Profile related starts
   const [openProfileMenu, setOpenProfileMenu] = React.useState(false);
@@ -126,10 +130,81 @@ const MessengerProvider: React.FC = (props) => {
   }, []);
 
   React.useEffect(() => {
-    if (authenticated) {
-      dispatch(loadAuthConversationData());
+    if (authenticated && !conversationsArray.length) {
+      dispatch(loadAuthConversationsData());
     }
-  }, [authenticated]);
+  }, [authenticated, conversationsArray]);
+
+  // TODO: listen for conversation and add to store if does not exist in the store already
+  React.useEffect(() => {
+    if (!conversationsLoading) {
+      return firestore
+        .collectionGroup(COLLECTIONS.conversations)
+        .where("deleted_at", "==", null)
+        .where(COLLECTIONS.participants, "array-contains", auth.uid)
+        .orderBy("created_at", "desc")
+        .onSnapshot((snapshot) => {
+          snapshot.docChanges().forEach((change) => {
+            switch (change.type) {
+              case "added":
+                const conversationId = change.doc.id;
+                dispatch(loadNewConversationData(conversationId));
+                break;
+
+              case "modified":
+                break;
+
+              case "removed":
+                break;
+
+              default:
+                break;
+            }
+          });
+        });
+    }
+  }, [conversationsLoading]);
+
+  React.useEffect(() => {
+    if (!conversationsLoading) {
+      return firestore
+        .collectionGroup(COLLECTIONS.messages)
+        .where("deleted_at", "==", null)
+        .orderBy("created_at", "desc")
+        .onSnapshot((snapshot) => {
+          snapshot.docChanges().forEach((change) => {
+            switch (change.type) {
+              case "added":
+                const conversationId = change.doc.ref.parent.parent.id;
+                const messageId = change.doc.id;
+                if (
+                  !userMessageIds.includes(messageId) &&
+                  userConversationIds.includes(conversationId)
+                ) {
+                  dispatch(
+                    conversationSlice.actions.storeNewMessage({
+                      conversationId,
+                      messageId,
+                      message: change.doc.data() as IUserMessage,
+                    })
+                  );
+                }
+
+                break;
+
+              case "modified":
+                break;
+
+              case "removed":
+                break;
+
+              default:
+                break;
+            }
+          });
+        });
+    }
+  }, [conversationsLoading]);
 
   const showProfileMenu = () => {
     setOpenProfileMenu(true);
@@ -148,7 +223,7 @@ const MessengerProvider: React.FC = (props) => {
     return conversationsMap[conversationId];
   };
 
-  const getSelectedConversationId = async () => {
+  const getSelectedConversationId = () => {
     if (!!selectedConvId) {
       return selectedConvId;
     } else {
@@ -208,7 +283,7 @@ const MessengerProvider: React.FC = (props) => {
     name: string
   ) =>
     firebase.uploadFile(path, data, dbPath, {
-      metadataFactory: (uploadRes, firebase1, metadata, downloadURL) => {
+      metadataFactory: (uploadRes, firebase, metadata, downloadURL) => {
         const {
           metadata: {
             fullPath,

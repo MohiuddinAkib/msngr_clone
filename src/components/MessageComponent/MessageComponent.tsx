@@ -1,7 +1,7 @@
 import React from "react";
 import { Emoji } from "emoji-mart";
 import IGif from "@giphy/js-types/dist/gif";
-import { Message } from "@src/data/domain/Message";
+import { Message } from "@src/data/firestoreClient/domain/Message";
 import GifMessage from "./GifMessage/GifMessageComponent";
 import TextMessage from "./TextMessage/TextMessageComponent";
 import FileMessage from "./FileMessage/FileMessageComponent";

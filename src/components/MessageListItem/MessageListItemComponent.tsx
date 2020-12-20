@@ -3,7 +3,7 @@ import List from "@material-ui/core/List";
 import Grid from "@material-ui/core/Grid";
 import Avatar from "@material-ui/core/Avatar";
 import MessageComponent from "../MessageComponent/MessageComponent";
-import { Message } from "@src/data/domain/Message";
+import { Message } from "@src/data/firestoreClient/domain/Message";
 import blueGrey from "@material-ui/core/colors/blueGrey";
 import useMediaQuery from "@material-ui/core/useMediaQuery";
 import { createStyles, makeStyles, useTheme } from "@material-ui/core/styles";

@@ -1,5 +1,5 @@
 import {QuerySnapshot} from "@firebase/firestore-types"
-import { Message, MessageBlock } from "@src/data/domain/Message";
+import { Message, MessageBlock } from "@src/data/firestoreClient/domain/Message";
 import { IUserFormattedMessage, IUserMessage } from "@src/models/IUserMessage";
 
 

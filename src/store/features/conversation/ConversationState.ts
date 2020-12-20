@@ -1,4 +1,4 @@
-import { IStoreUserConversation } from "@src/types/IStoreUserConversation";
+import { IStoreUserConversation } from "@store/types/IStoreUserConversation";
 export interface ConversationState {
     loading: boolean;
     selectedConvId: string;

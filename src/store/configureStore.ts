@@ -4,10 +4,8 @@ import firebase from "@src/api/firebaseClientApi"
 import {constants as rfConstants} from "redux-firestore"
 import {getFirestore, reduxFirestore} from "redux-firestore";
 import {configureStore, ThunkAction, Action} from "@reduxjs/toolkit";
-import {getFirebase, actionTypes as rrfActionTypes} from "react-redux-firebase";
-
-
 import {MakeStore, createWrapper, Context, HYDRATE} from "next-redux-wrapper";
+import {getFirebase, actionTypes as rrfActionTypes} from "react-redux-firebase";
 
 const store = configureStore({
     reducer: rootReducer,

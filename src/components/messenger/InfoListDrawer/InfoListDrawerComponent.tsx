@@ -69,7 +69,9 @@ const InfoListDrawerComponent: React.FC = (props) => {
   const conversation = messenger.getConversationById(
     router.query.conversation_uid as string
   );
-  const chatPartnerPresence = useUserPresence(conversation.chatPartner.id);
+  const chatPartnerPresence = useUserPresence(
+    conversation?.chatPartner.id || ""
+  );
 
   const handleMoreActionsCollapse = () => {
     setShowMoreActions((prevState) => !prevState);

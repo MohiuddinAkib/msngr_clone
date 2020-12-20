@@ -1,7 +1,7 @@
 import React from 'react'
 import useMessenger from './useMessenger';
-import { Participant } from '@src/data/domain/Participant';
-import { Conversation } from '@src/data/domain/Conversation';
+import { Participant } from '@src/data/firestoreClient/domain/Participant';
+import { Conversation } from '@src/data/firestoreClient/domain/Conversation';
 
 
 const useOtherParticipant = (conversationId: string | Conversation) => {

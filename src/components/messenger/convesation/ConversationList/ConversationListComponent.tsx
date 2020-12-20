@@ -1,12 +1,12 @@
 import React from "react";
 import List from "@material-ui/core/List";
-import { Message } from "@src/data/domain/Message";
+import { Message } from "@src/data/firestoreClient/domain/Message";
 import SearchIcon from "@material-ui/icons/Search";
 import TextField from "@material-ui/core/TextField";
 import { Scrollbars } from "react-custom-scrollbars";
 import IconButton from "@material-ui/core/IconButton";
 import ListSubheader from "@material-ui/core/ListSubheader";
-import { Conversation } from "@src/data/domain/Conversation";
+import { Conversation } from "@src/data/firestoreClient/domain/Conversation";
 import InputAdornment from "@material-ui/core/InputAdornment";
 import { createStyles, makeStyles } from "@material-ui/core/styles";
 import ConversationItemComponent from "@components/messenger/convesation/ConversationItem";

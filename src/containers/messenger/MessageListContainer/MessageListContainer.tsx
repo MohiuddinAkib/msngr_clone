@@ -6,9 +6,7 @@ import Box from "@material-ui/core/Box";
 import Badge from "@material-ui/core/Badge";
 import usePrevious from "@hooks/usePrevious";
 import useMessenger from "@hooks/useMessenger";
-import { MessageBlock } from "@src/data/domain/Message";
-import { IUserPresence } from "@src/models/IUserPresence";
-import useOtherParticipant from "@hooks/useOtherParticipant";
+import { MessageBlock } from "@src/data/firestoreClient/domain/Message";
 import { makeStyles, createStyles } from "@material-ui/core/styles";
 import KeyboardArrowDownIcon from "@material-ui/icons/KeyboardArrowDown";
 import MessageListComponent from "@src/components/MessageList/MessageListComponent";
@@ -39,8 +37,6 @@ const MessageListContainer = () => {
   const prevMessageBlocksMessagesCount = React.useRef(
     prevMessageBlocks?.length || 0
   );
-
-  console.log(prevMessageBlocks);
 
   React.useEffect(() => {
     if (newMessageArrived && !isElementInViewport(scroller.current)) {

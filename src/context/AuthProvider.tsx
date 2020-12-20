@@ -15,6 +15,7 @@ import {
   useFirebaseConnect,
   FirebaseReducer,
 } from "react-redux-firebase";
+import { cookies } from "@src/api/cookiesApi";
 
 const initialLoginValues = {
   email: "",
@@ -73,6 +74,17 @@ const AuthProvider: React.FC = (props) => {
   // Profile related ends;
 
   useFirebaseConnect("presence");
+
+  React.useEffect(() => {
+    return firebase.auth().onIdTokenChanged(async (user) => {
+      if (!user) {
+        cookies.set("token", "");
+      } else {
+        const token = await user.getIdToken();
+        cookies.set("token", token);
+      }
+    });
+  }, []);
 
   function userStatusAwayOnDocumentVisibilityHanler(e) {
     firebase

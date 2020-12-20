@@ -1,7 +1,7 @@
 import React from "react";
 import List from "@material-ui/core/List";
 import Popover from "@material-ui/core/Popover";
-import { MessageBlock } from "@src/data/domain/Message";
+import { MessageBlock } from "@src/data/firestoreClient/domain/Message";
 import MessageListItemComponent from "../MessageListItem/MessageListItemComponent";
 import { bindPopover, usePopupState } from "material-ui-popup-state/hooks";
 
