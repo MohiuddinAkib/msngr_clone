@@ -9,8 +9,8 @@ export type IThunkApi = {
   dispatch: AppDispatch;
   state: RootState;
   extra: {
+    getContainer: () => Container;
     getFirestore: () => ExtendedFirestoreInstance;
     getFirebase: () => ExtendedFirebaseInstance;
-    // container: Container;
   };
 };

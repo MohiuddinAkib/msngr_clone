@@ -63,15 +63,3 @@ export const login = createAsyncThunk<
     thunkApi.rejectWithValue(error);
   }
 });
-
-export const authSlice = createSlice({
-  name: "auth",
-  reducers: {},
-  initialState,
-  extraReducers: (builder) => {
-    builder
-      .addCase(login.fulfilled, (state) => {})
-      .addCase(logout.fulfilled, (state) => {})
-      .addCase(register.fulfilled, (state) => {});
-  },
-});

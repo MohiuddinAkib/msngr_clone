@@ -1,12 +1,17 @@
+import { original } from "immer";
 import { useDispatch } from "react-redux";
-import { produce, original } from "immer";
 import rootReducer from "@store/rootReducer";
 import container from "@src/inversify.config";
 import firebase from "@src/api/firebaseClientApi";
 import { constants as rfConstants } from "redux-firestore";
 import { getFirestore, reduxFirestore } from "redux-firestore";
 import { MakeStore, createWrapper, Context } from "next-redux-wrapper";
-import { configureStore, ThunkAction, Action } from "@reduxjs/toolkit";
+import {
+  configureStore,
+  ThunkAction,
+  Action,
+  createNextState,
+} from "@reduxjs/toolkit";
 import {
   getFirebase,
   actionTypes as rrfActionTypes,
@@ -34,7 +39,11 @@ const store = configureStore({
         ignoredPaths: ["firebase", "firestore"],
       },
       thunk: {
-        extraArgument: { getFirestore, getFirebase, container },
+        extraArgument: {
+          getFirestore,
+          getFirebase,
+          // getContainer: () => container,
+        },
       },
     }),
 });
@@ -51,7 +60,7 @@ export type AppThunk = ThunkAction<void, RootState, unknown, Action<string>>;
 export const wrapper = createWrapper<RootState>(makeStore, {
   debug: true,
   serializeState: (state) => {
-    return produce((state, draft) => draft);
+    return createNextState((state, draft) => draft);
   },
   deserializeState: (state) => {
     return original(state);
