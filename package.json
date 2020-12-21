@@ -50,6 +50,9 @@
     "use-sound": "^1.0.2"
   },
   "devDependencies": {
+    "@babel/core": "^7.12.10",
+    "@babel/plugin-proposal-class-properties": "^7.12.1",
+    "@babel/plugin-proposal-decorators": "^7.12.1",
     "@types/dom-mediacapture-record": "^1.0.7",
     "@types/emoji-mart": "^3.0.2",
     "@types/node": "^14.0.23",
@@ -57,6 +60,7 @@
     "@types/react-mic": "^12.4.2",
     "@types/react-redux": "^7.1.9",
     "@types/react-resize-detector": "^5.0.0",
+    "babel-plugin-transform-typescript-metadata": "^0.3.1",
     "file-loader": "^6.2.0",
     "resize-observer-polyfill": "^1.5.1",
     "typescript": "^3.9.6",

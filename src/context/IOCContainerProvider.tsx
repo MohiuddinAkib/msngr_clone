@@ -1,10 +1,16 @@
 import React from "react";
+import container from "@src/inversify.config";
+import { useFirestoreService } from "@src/data/firestoreClient/dependecyRegisterar";
 
-const IOCContainerContext = React.createContext({});
+export const IOCContainerContext = React.createContext({ container });
 
 const IOCContainerProvider: React.FC = (props) => {
+  React.useEffect(() => {
+    useFirestoreService(container);
+  }, []);
+
   return (
-    <IOCContainerContext.Provider value={{}}>
+    <IOCContainerContext.Provider value={{ container }}>
       {props.children}
     </IOCContainerContext.Provider>
   );

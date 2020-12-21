@@ -2,11 +2,13 @@ import React from "react";
 import moment from "moment";
 import { useRouter } from "next/router";
 import { useSelector } from "react-redux";
+import { cookies } from "@src/api/cookiesApi";
 import { IProfile } from "@src/models/IProfile";
-import { RootState } from "@store/configureStore";
 import * as AuthTypes from "@firebase/auth-types";
 import { useErrorHandler } from "react-error-boundary";
+import { COLLECTIONS } from "@src/api/firebaseClientApi";
 import { IUserPresence } from "@src/models/IUserPresence";
+import { RootState, useAppDispatch } from "@store/configureStore";
 import AuthIsLoadedComponent from "@components/auth/AuthIsLoaded";
 import {
   isEmpty,
@@ -15,7 +17,7 @@ import {
   useFirebaseConnect,
   FirebaseReducer,
 } from "react-redux-firebase";
-import { cookies } from "@src/api/cookiesApi";
+import { login, logout, register } from "@store/features/auth/authSlice";
 
 const initialLoginValues = {
   email: "",
@@ -60,6 +62,7 @@ export const AuthContext = React.createContext<{
 const AuthProvider: React.FC = (props) => {
   const router = useRouter();
   const firebase = useFirebase();
+  const dispatch = useAppDispatch();
   const handleError = useErrorHandler();
   const auth = useSelector<RootState, FirebaseReducer.AuthState>(
     (state) => state.firebase.auth
@@ -73,7 +76,7 @@ const AuthProvider: React.FC = (props) => {
   );
   // Profile related ends;
 
-  useFirebaseConnect("presence");
+  useFirebaseConnect(COLLECTIONS.presence);
 
   React.useEffect(() => {
     return firebase.auth().onIdTokenChanged(async (user) => {
@@ -127,7 +130,7 @@ const AuthProvider: React.FC = (props) => {
           if (snap.val()) {
             firebase
               .database()
-              .ref(`presence/${auth.uid}`)
+              .ref(`${COLLECTIONS.presence}/${auth.uid}`)
               .once("value", (snapshot) => {
                 if (snapshot.exists()) {
                   snapshot.ref.update({
@@ -166,10 +169,12 @@ const AuthProvider: React.FC = (props) => {
 
   const handleLogin = async (values: typeof initialLoginValues) => {
     try {
-      await firebase.login(values);
+      const resultAction = await dispatch(login(values));
 
-      const redirecPath = (router.query.next as string) || "/";
-      router.replace({ pathname: redirecPath });
+      if (login.fulfilled.match(resultAction)) {
+        const redirecPath = (router.query.next as string) || "/";
+        router.replace({ pathname: redirecPath });
+      }
     } catch (e) {
       handleError(e);
     }
@@ -177,8 +182,7 @@ const AuthProvider: React.FC = (props) => {
 
   const handleRegister = async (values: typeof initialRegisterValues) => {
     try {
-      const { email, password, ...profile } = values;
-      await firebase.createUser({ email, password }, profile);
+      await dispatch(register(values));
     } catch (e) {
       handleError(e);
     }
@@ -186,16 +190,13 @@ const AuthProvider: React.FC = (props) => {
 
   const handleLogout = async () => {
     try {
-      await firebase.database().ref("presence").child(auth.uid).update({
-        state: "offline",
-        last_changed: moment().toISOString(),
-      });
+      const resultAction = await dispatch(logout());
 
-      await firebase.logout();
-
-      router.replace({
-        pathname: "/login",
-      });
+      if (logout.fulfilled.match(resultAction)) {
+        router.replace({
+          pathname: "/login",
+        });
+      }
     } catch (error) {
       handleError(error);
     }

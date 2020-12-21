@@ -1,4 +1,5 @@
 import React from "react";
+import "reflect-metadata";
 import Head from "next/head";
 import PropTypes from "prop-types";
 import { AppProps } from "next/app";

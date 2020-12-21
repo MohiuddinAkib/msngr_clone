@@ -6,6 +6,7 @@ import firebase from "@src/api/firebaseClientApi";
 import { Theme } from "@material-ui/core/styles";
 import { RootState } from "@store/configureStore";
 import MessengerProvider from "./MessengerProvider";
+import IOCContainerProvider from "./IOCContainerProvider";
 import { createFirestoreInstance } from "redux-firestore";
 import { ReactReduxFirebaseProvider } from "react-redux-firebase";
 import { ErrorBoundary, FallbackProps } from "react-error-boundary";
@@ -66,14 +67,16 @@ const AppProvider: React.FC = (props) => {
             dispatch={store.dispatch}
             createFirestoreInstance={createFirestoreInstance}
           >
-            <ErrorBoundary
-              onReset={resetErrorBoundary}
-              FallbackComponent={ErrorFallback}
-            >
-              <AuthProvider>
-                <MessengerProvider>{props.children}</MessengerProvider>
-              </AuthProvider>
-            </ErrorBoundary>
+            <IOCContainerProvider>
+              <ErrorBoundary
+                onReset={resetErrorBoundary}
+                FallbackComponent={ErrorFallback}
+              >
+                <AuthProvider>
+                  <MessengerProvider>{props.children}</MessengerProvider>
+                </AuthProvider>
+              </ErrorBoundary>
+            </IOCContainerProvider>
           </ReactReduxFirebaseProvider>
         )}
       </ReactReduxContext.Consumer>
