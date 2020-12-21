@@ -42,7 +42,7 @@ const store = configureStore({
         extraArgument: {
           getFirestore,
           getFirebase,
-          // getContainer: () => container,
+          getContainer: () => container,
         },
       },
     }),
