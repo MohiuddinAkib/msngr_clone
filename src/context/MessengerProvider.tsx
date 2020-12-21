@@ -7,8 +7,8 @@ import IGif from "@giphy/js-types/dist/gif";
 import { IUserMessage } from "@src/models/IUserMessage";
 import * as StorageTypes from "@firebase/storage-types";
 import { COLLECTIONS } from "@src/api/firebaseClientApi";
-import { Conversation } from "@src/data/firestoreClient/domain/Conversation";
 import { RootState, useAppDispatch } from "@store/configureStore";
+import { Conversation } from "@src/data/firestoreClient/domain/Conversation";
 import {
   useFirebase,
   useFirestore,
@@ -22,8 +22,8 @@ import {
   userConversationIdsSelector,
   selectedConversationSelector,
   conversationsLoadingSelector,
-  userConversationsArrayConvertedSelector,
   userConversationsMapConvertedSelector,
+  userConversationsArrayConvertedSelector,
 } from "@store/features/conversation/conversationSlice";
 
 export const MessengerContext = React.createContext<{
@@ -135,7 +135,6 @@ const MessengerProvider: React.FC = (props) => {
     }
   }, [authenticated, conversationsArray]);
 
-  // TODO: listen for conversation and add to store if does not exist in the store already
   React.useEffect(() => {
     if (!conversationsLoading && authenticated) {
       return firestore
