@@ -9,6 +9,8 @@ import { GetServerSideProps, NextPage, GetServerSidePropsContext } from "next";
 import LayoutContentComponent from "@components/messenger/content/LayoutContent";
 import ListDrawerComponent from "@components/messenger/convesation/ConversationListDrawer";
 import MessageListContainer from "@containers/messenger/MessageListContainer/MessageListContainer";
+import container from "@src/inversify.config";
+import { providerTypes } from "@src/core/providerTypes";
 
 const Conversation: NextPage = (props) => {
   return (

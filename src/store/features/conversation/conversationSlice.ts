@@ -9,235 +9,297 @@ import { authStateSelector } from "@store/selectors/authSelector";
 import { formatMessageWithoutConverter } from "@src/api/conversationApi";
 import { IStoreUserConversation } from "@store/types/IStoreUserConversation";
 import { Conversation } from "@src/data/firestoreClient/domain/Conversation";
-import {createAsyncThunk, createSlice, createSelector, PayloadAction, current} from "@reduxjs/toolkit";
+import {
+  createAsyncThunk,
+  createSlice,
+  createSelector,
+  PayloadAction,
+  current,
+} from "@reduxjs/toolkit";
+import { providerTypes } from "@src/core/providerTypes";
 
 const initialState: ConversationState = {
-    loading: false,
-    selectedConvId: "",
-    user_conversations: {},
-}
+  loading: false,
+  selectedConvId: "",
+  user_conversations: {},
+};
 
-export const loadNewConversationData = createAsyncThunk<{id: string; conversation: IStoreUserConversation}, string, IThunkApi>("conversations/loadNewConversationData", async (conversationId: string, thunkApi) => {
+export const loadNewConversationData = createAsyncThunk<
+  { id: string; conversation: IStoreUserConversation },
+  string,
+  IThunkApi
+>(
+  "conversations/loadNewConversationData",
+  async (conversationId: string, thunkApi) => {
     try {
-        const firestore = thunkApi.extra.getFirestore();
-        const state = thunkApi.getState()
-        const auth = state.firebase.auth
+      const state = thunkApi.getState();
+      const auth = state.firebase.auth;
+      const firestore = thunkApi.extra.getFirestore();
 
-        const conversation:  IStoreUserConversation = {
-            messages: {},
-            participants: {},
-            data: {},
-            formatted_messages: []
-        } as IStoreUserConversation;
+      const conversation: IStoreUserConversation = {
+        messages: {},
+        participants: {},
+        data: {},
+        formatted_messages: [],
+      } as IStoreUserConversation;
 
-        if(!auth) {
-            return {id: "", conversation};
-        }
+      if (!auth) {
+        return { id: "", conversation };
+      }
 
-        const conversationQuerySnapshot = await firestore
+      const conversationQuerySnapshot = await firestore
         .collection(COLLECTIONS.conversations)
         .doc(conversationId)
         .get();
 
-        const messagesQuerySnapshot = await conversationQuerySnapshot.ref
+      const messagesQuerySnapshot = await conversationQuerySnapshot.ref
         .collection(COLLECTIONS.messages)
         .where("deleted_at", "==", null)
         .orderBy("created_at", "asc")
         .get();
 
-        const participantsQuerySnapshot = await conversationQuerySnapshot.ref
+      const participantsQuerySnapshot = await conversationQuerySnapshot.ref
         .collection(COLLECTIONS.participants)
         .get();
 
-        const messageIds = [];
-        const messages: IUserMessage[] = [];
+      const messageIds = [];
+      const messages: IUserMessage[] = [];
 
-        messagesQuerySnapshot.forEach((messageDoc) => {
-            const message = messageDoc.data() as IUserMessage;
-            messages.push(message)
-            messageIds.push(messageDoc.id)
-            conversation.messages[messageDoc.id] = message;
-        });
+      messagesQuerySnapshot.forEach((messageDoc) => {
+        const message = messageDoc.data() as IUserMessage;
+        messages.push(message);
+        messageIds.push(messageDoc.id);
+        conversation.messages[messageDoc.id] = message;
+      });
 
-        const formattedMessages = formatMessageWithoutConverter(messageIds, messages)
-        conversation.formatted_messages = formattedMessages
+      const formattedMessages = formatMessageWithoutConverter(
+        messageIds,
+        messages
+      );
+      conversation.formatted_messages = formattedMessages;
 
-        participantsQuerySnapshot.forEach((participantDoc) => {
-            const participant = participantDoc.data() as IParticipant;
+      participantsQuerySnapshot.forEach((participantDoc) => {
+        const participant = participantDoc.data() as IParticipant;
 
-            conversation.participants[
-                participantDoc.id
-            ] = participant;
-        });
+        conversation.participants[participantDoc.id] = participant;
+      });
 
-        return {id: conversationQuerySnapshot.id, conversation: conversation as  IStoreUserConversation}
+      return {
+        id: conversationQuerySnapshot.id,
+        conversation: conversation as IStoreUserConversation,
+      };
     } catch (error) {
-      return thunkApi.rejectWithValue(error)
+      return thunkApi.rejectWithValue(error);
     }
-})
+  }
+);
 
-export const loadAuthConversationsData = createAsyncThunk<Record<string, IStoreUserConversation>, void, IThunkApi>("conversations/loadConversationData", async (data: void, thunkApi) => {
-    try {
-        const firestore = thunkApi.extra.getFirestore();
-        const state = thunkApi.getState()
-        const auth = state.firebase.auth
+export const loadAuthConversationsData = createAsyncThunk<
+  Record<string, IStoreUserConversation>,
+  void,
+  IThunkApi
+>("conversations/loadConversationData", async (data: void, thunkApi) => {
+  try {
+    const firestore = thunkApi.extra.getFirestore();
+    const state = thunkApi.getState();
+    const auth = state.firebase.auth;
 
-        const conversations: Record<string, IStoreUserConversation> = {};
+    const conversations: Record<string, IStoreUserConversation> = {};
 
-        if(!auth) {
-            return conversations;
-        }
-
-        const conversationsQuerySnapshot = await firestore
-        .collection(COLLECTIONS.conversations)
-        .where(COLLECTIONS.participants, "array-contains", auth.uid)
-        .where("deleted_at", "==", null)
-        .orderBy("last_activity", "desc")
-        .get();
-
-
-        const messagesQuerySnapshotsPromise = conversationsQuerySnapshot.docs.map(
-        (conversationDoc) =>
-            conversationDoc.ref
-            .collection(COLLECTIONS.messages)
-            .where("deleted_at", "==", null)
-            
-            .orderBy("created_at", "asc")
-            .get()
-        );
-
-        const participantsQuerySnapshotsPromise = conversationsQuerySnapshot.docs.map(
-        (conversationDoc) =>
-            conversationDoc.ref
-            .collection(COLLECTIONS.participants)
-            .get()
-        );
-
-        const messagesQuerySnapshots = await Promise.all(
-        messagesQuerySnapshotsPromise
-        );
-
-        const participantsQuerySnapshots = await Promise.all(
-        participantsQuerySnapshotsPromise
-        );
-
-        let index = 0;
-        conversationsQuerySnapshot.forEach((conversationDoc) => {
-        const conversation = conversationDoc.data() as IConversation;
-
-        conversations[conversationDoc.id] = {
-            messages: {},
-            participants: {},
-            data: conversation,
-            formatted_messages: []
-        };
-
-        const messagesQuerySnapshot = messagesQuerySnapshots[index];
-        const messageIds = [];
-        const messages: IUserMessage[] = [];
-
-        messagesQuerySnapshot.forEach((messageDoc) => {
-            const message = messageDoc.data() as IUserMessage;
-            messages.push(message)
-            messageIds.push(messageDoc.id)
-            conversations[conversationDoc.id].messages[messageDoc.id] = message;
-        });
-
-        const formattedMessages = formatMessageWithoutConverter(messageIds, messages)
-        conversations[conversationDoc.id].formatted_messages = formattedMessages
-
-        const participantsQuerySnapshot = participantsQuerySnapshots[index];
-        participantsQuerySnapshot.forEach((participantDoc) => {
-            const participant = participantDoc.data() as IParticipant;
-
-            conversations[conversationDoc.id].participants[
-                participantDoc.id
-            ] = participant;
-        });
-
-        index++;
-        });
-
-        return conversations as Record<string, IStoreUserConversation>;
-    } catch (error) {
-      return thunkApi.rejectWithValue(error)
+    if (!auth) {
+      return conversations;
     }
-})
+
+    const conversationsQuerySnapshot = await firestore
+      .collection(COLLECTIONS.conversations)
+      .where(COLLECTIONS.participants, "array-contains", auth.uid)
+      .where("deleted_at", "==", null)
+      .orderBy("last_activity", "desc")
+      .get();
+
+    const messagesQuerySnapshotsPromise = conversationsQuerySnapshot.docs.map(
+      (conversationDoc) =>
+        conversationDoc.ref
+          .collection(COLLECTIONS.messages)
+          .where("deleted_at", "==", null)
+
+          .orderBy("created_at", "asc")
+          .get()
+    );
+
+    const participantsQuerySnapshotsPromise = conversationsQuerySnapshot.docs.map(
+      (conversationDoc) =>
+        conversationDoc.ref.collection(COLLECTIONS.participants).get()
+    );
+
+    const messagesQuerySnapshots = await Promise.all(
+      messagesQuerySnapshotsPromise
+    );
+
+    const participantsQuerySnapshots = await Promise.all(
+      participantsQuerySnapshotsPromise
+    );
+
+    let index = 0;
+    conversationsQuerySnapshot.forEach((conversationDoc) => {
+      const conversation = conversationDoc.data() as IConversation;
+
+      conversations[conversationDoc.id] = {
+        messages: {},
+        participants: {},
+        data: conversation,
+        formatted_messages: [],
+      };
+
+      const messagesQuerySnapshot = messagesQuerySnapshots[index];
+      const messageIds = [];
+      const messages: IUserMessage[] = [];
+
+      messagesQuerySnapshot.forEach((messageDoc) => {
+        const message = messageDoc.data() as IUserMessage;
+        messages.push(message);
+        messageIds.push(messageDoc.id);
+        conversations[conversationDoc.id].messages[messageDoc.id] = message;
+      });
+
+      const formattedMessages = formatMessageWithoutConverter(
+        messageIds,
+        messages
+      );
+      conversations[conversationDoc.id].formatted_messages = formattedMessages;
+
+      const participantsQuerySnapshot = participantsQuerySnapshots[index];
+      participantsQuerySnapshot.forEach((participantDoc) => {
+        const participant = participantDoc.data() as IParticipant;
+
+        conversations[conversationDoc.id].participants[
+          participantDoc.id
+        ] = participant;
+      });
+
+      index++;
+    });
+
+    return conversations as Record<string, IStoreUserConversation>;
+  } catch (error) {
+    return thunkApi.rejectWithValue(error);
+  }
+});
 
 export const conversationSlice = createSlice({
-    name: "conversations",
-    initialState,
-    reducers: {
-        selectConversation: (state, action) => {
-            state.selectedConvId = action.payload
-        },
-        storeNewMessage: (state, action: PayloadAction<{
-            conversationId: string;
-            messageId: string;
-            message: IUserMessage}>) => {
-            const {conversationId, messageId, message} = action.payload
-            const conversation = state.user_conversations[conversationId]
-            if(conversation) {
-                conversation.messages[messageId] = message
-
-                const formattedMessages = conversation.formatted_messages
-                const formattedMessagesLen = formattedMessages.length
-                const lastFormattedMessage = formattedMessages[formattedMessagesLen - 1]
-
-                if(lastFormattedMessage.messages[0].sender_id === message.sender_id) {
-                    lastFormattedMessage.messages.push({id: messageId, ...message})
-                } else {
-                    formattedMessages.push({
-                        key: messageId,
-                        messages: [{id: messageId, ...message}]
-                    })
-                }
-            }
-        }
+  name: "conversations",
+  initialState,
+  reducers: {
+    selectConversation: (state, action) => {
+      state.selectedConvId = action.payload;
     },
-    extraReducers: builder => {
-        builder.addCase(loadAuthConversationsData.pending, (state) => {
-            state.loading = true
-        })
-        .addCase(loadAuthConversationsData.rejected, (state) => {
-            state.loading = false
-        })
-        .addCase(loadAuthConversationsData.fulfilled, (state, action) => {
-            state.user_conversations = action.payload
-            state.loading = false
-        })
-        .addCase(loadNewConversationData.fulfilled, (state, action) => {
-            state.user_conversations[action.payload.id] = action.payload.conversation
-        })
-    }
-})
+    storeNewMessage: (
+      state,
+      action: PayloadAction<{
+        conversationId: string;
+        messageId: string;
+        message: IUserMessage;
+      }>
+    ) => {
+      const { conversationId, messageId, message } = action.payload;
+      const conversation = state.user_conversations[conversationId];
+      if (conversation) {
+        conversation.messages[messageId] = message;
 
-export const conversationStateSelector = (state: RootState) => state.conversation
+        const formattedMessages = conversation.formatted_messages;
+        const formattedMessagesLen = formattedMessages.length;
+        const lastFormattedMessage =
+          formattedMessages[formattedMessagesLen - 1];
 
-export const conversationsLoadingSelector = createSelector(conversationStateSelector, state => state.loading)
+        if (lastFormattedMessage.messages[0].sender_id === message.sender_id) {
+          lastFormattedMessage.messages.push({ id: messageId, ...message });
+        } else {
+          formattedMessages.push({
+            key: messageId,
+            messages: [{ id: messageId, ...message }],
+          });
+        }
+      }
+    },
+  },
+  extraReducers: (builder) => {
+    builder
+      .addCase(loadAuthConversationsData.pending, (state) => {
+        state.loading = true;
+      })
+      .addCase(loadAuthConversationsData.rejected, (state) => {
+        state.loading = false;
+      })
+      .addCase(loadAuthConversationsData.fulfilled, (state, action) => {
+        state.user_conversations = action.payload;
+        state.loading = false;
+      })
+      .addCase(loadNewConversationData.fulfilled, (state, action) => {
+        state.user_conversations[action.payload.id] =
+          action.payload.conversation;
+      });
+  },
+});
 
-export const selectedConversationIdSelector = createSelector(conversationStateSelector, (state) => state.selectedConvId)
+export const conversationStateSelector = (state: RootState) =>
+  state.conversation;
 
-export const userConversationsSelector = createSelector(conversationStateSelector, (converationState) => converationState.user_conversations)
+export const conversationsLoadingSelector = createSelector(
+  conversationStateSelector,
+  (state) => state.loading
+);
 
-export const userConversationsMapConvertedSelector = createSelector(authStateSelector, userConversationsSelector, (auth, userConversations) => Object.entries(userConversations).map(([id, conversation]) => {
-    const obj =  new Conversation(auth.uid, id, conversation.data)
-    obj.setMessages(conversation.messages)
-    obj.setParticipants(conversation.participants)
-    obj.setFormattedMessages(conversation.formatted_messages)
-    return obj
-}).reduce((acc, curr) => {
-    acc[curr.id] = curr
-    return acc
-}, {} as Record<string, Conversation>))
+export const selectedConversationIdSelector = createSelector(
+  conversationStateSelector,
+  (state) => state.selectedConvId
+);
 
-export const userConversationsArrayConvertedSelector = createSelector(userConversationsMapConvertedSelector, (userConversations) => {
-    return Object.values(userConversations)
-})
+export const userConversationsSelector = createSelector(
+  conversationStateSelector,
+  (converationState) => converationState.user_conversations
+);
 
-export const selectedConversationSelector = createSelector(userConversationsMapConvertedSelector,selectedConversationIdSelector, (user_conversations, selectedConversationId) => user_conversations[selectedConversationId])
+export const userConversationsMapConvertedSelector = createSelector(
+  authStateSelector,
+  userConversationsSelector,
+  (auth, userConversations) =>
+    Object.entries(userConversations)
+      .map(([id, conversation]) => {
+        const obj = new Conversation(auth.uid, id, conversation.data);
+        obj.setMessages(conversation.messages);
+        obj.setParticipants(conversation.participants);
+        obj.setFormattedMessages(conversation.formatted_messages);
+        return obj;
+      })
+      .reduce((acc, curr) => {
+        acc[curr.id] = curr;
+        return acc;
+      }, {} as Record<string, Conversation>)
+);
 
-export const userMessageIdsSelector = createSelector(userConversationsSelector, (user_conversations) => Object.values(user_conversations).flatMap((conversationInfo) => Object.keys(conversationInfo.messages))
-)
+export const userConversationsArrayConvertedSelector = createSelector(
+  userConversationsMapConvertedSelector,
+  (userConversations) => {
+    return Object.values(userConversations);
+  }
+);
 
-export const userConversationIdsSelector = createSelector(userConversationsSelector, (user_conversations) => Object.keys(user_conversations))
+export const selectedConversationSelector = createSelector(
+  userConversationsMapConvertedSelector,
+  selectedConversationIdSelector,
+  (user_conversations, selectedConversationId) =>
+    user_conversations[selectedConversationId]
+);
+
+export const userMessageIdsSelector = createSelector(
+  userConversationsSelector,
+  (user_conversations) =>
+    Object.values(user_conversations).flatMap((conversationInfo) =>
+      Object.keys(conversationInfo.messages)
+    )
+);
+
+export const userConversationIdsSelector = createSelector(
+  userConversationsSelector,
+  (user_conversations) => Object.keys(user_conversations)
+);

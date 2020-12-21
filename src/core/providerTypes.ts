@@ -3,6 +3,6 @@
  * We use symbols as identifiers but you can also use classes and or string literals.
  */
 export const providerTypes = {
-  AuthService: Symbol('AuthorizeService'),
-  ConversationService: Symbol('ConversationService'),
-}
+  AuthService: Symbol.for("AuthService"),
+  ConversationService: Symbol.for("ConversationService"),
+};
